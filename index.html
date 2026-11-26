@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Destinauta · Travel finder</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#6d1a2a">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Destinauta">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;600;800&family=Pacifico&display=swap" rel="stylesheet">
+<style>
+/* VOICE: a friendly travel desk — confident, practical, warm.
+   IDEA: a passport and a year planner in one: pick a month on the calendar strip, the stamps tell you who welcomes you.
+   PICTURE: the twelve-month season strip as the hero, coloured by season, with destination cards like passport pages below.
+   COLOUR and TYPE: passport burgundy dominant, sea teal support, sun yellow accent; Archivo 800 titles + Archivo body.
+   LAYOUT: burgundy header band with strip, filter panel, alerts, then a responsive grid of cards. */
+:root{color-scheme:light dark;
+--bg:light-dark(#ffffff,#121518);--ink:light-dark(#1d1b1c,#eceae6);--mute:light-dark(#5f5a5c,#a9a4a2);
+--line:light-dark(#e6e1df,#2b2f33);--card:light-dark(#ffffff,#1a1e22);--soft:light-dark(#f7f3f1,#1d2226);
+--brand:#6d1a2a;--brand2:light-dark(#6d1a2a,#e07b8c);--teal:light-dark(#0e6b6b,#5cc2bf);--sun:#f2b705;
+--win:#3d7ea6;--spr:#4f9457;--sum:#d89a12;--aut:#bf5b27;
+--s1:light-dark(#fff3c4,#4a3f12);--s2:light-dark(#ffd9a8,#5a3510);--s3:light-dark(#ffc2bd,#5e1a1a)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Nunito,system-ui,sans-serif;overflow-x:clip}
+.band{padding:clamp(24px,4vw,56px) max(5vw,16px)}
+.wrap{max-width:1240px;margin:0 auto}
+header{background:var(--brand);color:#fff8f0}
+.top{display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;align-items:flex-start}
+h1{font-weight:800;font-size:clamp(34px,5vw,52px);line-height:1.05;margin:0;text-wrap:balance}
+.sub{margin:8px 0 0;max-width:62ch;opacity:.9}
+.lang{display:flex;border:1.5px solid #fff8f0;border-radius:999px;overflow:hidden}
+.lang button{background:none;border:0;color:#fff8f0;font:600 15px Fredoka,Nunito,sans-serif;padding:0 18px;min-height:44px;cursor:pointer}
+.lang button[aria-pressed=true]{background:#fff8f0;color:var(--brand)}
+.ed{margin-top:14px;font-size:14px;opacity:.85}
+.months{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:6px;margin-top:28px}
+.mo{border:0;border-radius:12px;min-height:92px;padding:10px 4px;cursor:pointer;color:#fff;font:600 15px Fredoka,Nunito,sans-serif;display:flex;flex-direction:column;justify-content:space-between;align-items:center;transition:transform .15s}
+.mo small{font-weight:400;font-size:13px;opacity:.85}
+.mo[aria-pressed=true]{outline:3px solid var(--sun);outline-offset:2px;transform:translateY(-4px)}
+.mo:focus-visible,button:focus-visible,select:focus-visible,input:focus-visible,summary:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+.seasonline{margin-top:16px;font-size:15px}
+.seasonline b{font-size:20px}
+.filters{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:18px 26px}
+.f h3{font-size:15px;margin:0 0 8px;color:var(--brand2)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1.5px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:0 14px;min-height:40px;font:500 15px Fredoka,Nunito,sans-serif;cursor:pointer}
+.chip[aria-pressed=true]{background:var(--teal);border-color:var(--teal);color:light-dark(#fff,#0b1a1a)}
+select,input[type=search]{width:100%;min-height:44px;font:16px Fredoka,Nunito,sans-serif;border:1.5px solid var(--line);border-radius:10px;padding:0 12px;background:var(--card);color:var(--ink)}
+input[type=range]{width:100%;accent-color:var(--teal);min-height:32px}
+.row{display:flex;justify-content:space-between;gap:8px;font-size:14px;color:var(--mute)}
+.reset{background:none;border:1.5px solid var(--brand2);color:var(--brand2);border-radius:999px;min-height:44px;padding:0 18px;font:600 15px Fredoka,Nunito,sans-serif;cursor:pointer}
+.panel{background:var(--soft)}
+.alerts{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));margin-top:12px}
+.alert{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:15px}
+.alert time{display:block;font-size:13px;color:var(--mute)}
+h2{font-size:28px;line-height:1.1;margin:0}
+.bar{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:end;margin-bottom:18px}
+.bar select{width:auto}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr));gap:18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:10px}
+.card h4{margin:0;font-size:20px;line-height:1.2}
+.ideal{align-self:flex-start;background:var(--sun);color:#2a1d00;font-size:13px;font-weight:600;border-radius:999px;padding:2px 10px}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;text-align:center}
+.stats div{background:var(--soft);border-radius:10px;padding:6px 2px}
+.stats b{display:block;font-size:19px;white-space:nowrap}
+.stats span{font-size:13px;color:var(--mute)}
+.pills{display:flex;flex-wrap:wrap;gap:6px}
+.pill{font-size:13px;border-radius:999px;padding:3px 10px;background:var(--soft);white-space:nowrap}
+.p1{background:var(--s1)}.p2{background:var(--s2)}.p3{background:var(--s3)}
+.doc{font-size:15px;border-left:4px solid var(--teal);padding-left:10px}
+.doc b{color:var(--teal)}
+.sec{font-size:15px;border-radius:12px;padding:10px 12px;border:2px solid transparent}
+.sec b{display:block;font-family:Fredoka,sans-serif;font-weight:600}
+.s1{background:light-dark(#e6f5ea,#173226)}.s2{background:var(--s1)}.s3{background:var(--s2);border-color:#d9822b}.s4{background:var(--s3);border-color:#c4452b}
+.warnflag{position:absolute;left:0;right:0;bottom:0;background:#c4452be8;color:#fff;font:600 14px Fredoka,sans-serif;padding:5px 12px}
+.warnflag.w3{background:#d9822be8}
+.see{margin:0;padding-left:18px;font-size:15px}
+details summary{cursor:pointer;font-weight:600;color:var(--brand2);min-height:44px;display:flex;align-items:center}
+.cal{display:grid;grid-template-columns:3.4em repeat(12,minmax(0,1fr));gap:2px;font-size:13px;align-items:end;margin:6px 0}
+.cal .l{color:var(--mute);align-self:center}
+.cal .m{text-align:center;color:var(--mute)}
+.cal .m.on{color:var(--ink);font-weight:800}
+.tb{height:60px;display:flex;align-items:flex-end;justify-content:center}
+.tb i{display:block;width:72%;border-radius:4px 4px 0 0}
+.cell{height:16px;border-radius:3px;background:var(--soft)}
+.meta{font-size:14px;color:var(--mute);margin:6px 0}
+.meta a{color:var(--teal)}
+.trip{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:14px 22px;margin-bottom:22px;padding-bottom:22px;border-bottom:1.5px solid var(--line)}
+.trip input[type=number]{width:100%;min-height:44px;font:16px Fredoka,Nunito,sans-serif;border:1.5px solid var(--line);border-radius:10px;padding:0 12px;background:var(--card);color:var(--ink)}
+.cost{background:color-mix(in srgb,var(--sun) 18%,var(--card));border-radius:12px;padding:10px 12px;font-size:15px}
+.cost b{font-size:22px;white-space:nowrap}
+.cost small{display:block;color:var(--mute);font-size:13px}
+.empty{padding:40px;text-align:center;color:var(--mute);border:1.5px dashed var(--line);border-radius:16px}
+footer{font-size:14px;color:var(--mute)}
+footer a{color:var(--teal)}
+header.hero{position:relative;overflow:hidden;color:#0f2d4a;background:#8fd3f4;padding-bottom:clamp(170px,24vw,300px)}
+.scene{position:absolute;inset:0;width:100%;height:100%}
+.hero .wrap{position:relative}
+h1{font-family:Pacifico,Fredoka,cursive;font-weight:400;font-size:clamp(40px,6vw,64px);line-height:1.15;color:#0f2d4a}
+h1 small{display:block;font-family:Fredoka,sans-serif;font-weight:600;font-size:clamp(20px,2.6vw,28px);line-height:1.2;margin-top:4px}
+.hero .sub{font-size:17px;font-weight:600;opacity:1}
+.hero .ed{display:inline-block;background:#ffffffd0;border-radius:999px;padding:4px 14px;font-weight:600;opacity:1}
+.lang{border-color:#0f2d4a;background:#ffffffb0}.lang button{color:#0f2d4a}.lang button[aria-pressed=true]{background:#0f2d4a;color:#fff}
+.ticket{background:var(--bg);padding-top:28px;padding-bottom:20px;position:relative}
+.ticket::before{content:"";position:absolute;left:0;right:0;top:-10px;height:20px;background:radial-gradient(circle at 10px 10px,var(--bg) 9px,transparent 10px) repeat-x;background-size:20px 20px}
+.months{margin-top:0}
+.mo{font-family:Fredoka,sans-serif;font-size:17px;border-radius:16px;box-shadow:0 4px 0 #0002;gap:4px}
+.mo svg{width:30px;height:30px}
+h2,h3,.card h4,.stats b{font-family:Fredoka,Nunito,sans-serif}
+h2{font-weight:700}
+.f h3{font-weight:600;font-size:16px}
+.card{padding:0;overflow:hidden;border-radius:20px;box-shadow:0 6px 18px light-dark(#0f2d4a14,#0006);transition:transform .2s}
+.card:hover{transform:translateY(-3px) rotate(-.3deg)}
+.card>.body{padding:16px 18px 18px;display:flex;flex-direction:column;gap:10px}
+.post{position:relative;height:150px;border-bottom:3px dashed light-dark(#f1e3c8,#3a3328)}
+.post svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+.stamp{position:absolute;right:12px;top:12px;background:#fffdf6;color:#6d1a2a;border:2px dashed #6d1a2a;padding:4px 8px;font:600 14px Fredoka,sans-serif;transform:rotate(4deg);display:flex;align-items:center;gap:4px;white-space:nowrap}
+.stamp svg{position:static;width:16px;height:16px}
+.ideal{position:absolute;left:12px;top:12px;width:78px;height:78px;border-radius:50%;display:grid;place-items:center;text-align:center;background:#f2b705e6;color:#2a1d00;border:2px dashed #6b4a00;font:600 13px/1.1 Fredoka,sans-serif;padding:6px;transform:rotate(-10deg)}
+.card h4{font-size:22px;font-weight:600}
+h2 .ic{display:inline-block;width:30px;height:30px;vertical-align:-5px;margin-right:8px}
+@media(max-width:700px){.mo svg{width:22px;height:22px}}
+@media(prefers-reduced-motion:reduce){.card{transition:none}.card:hover{transform:none}}
+.fromrow{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin:0 0 12px;background:var(--soft);border-radius:14px;padding:10px 12px}
+.fromrow label{font:600 16px Fredoka,sans-serif}
+.fromrow input{flex:1 1 200px;min-height:44px;font:16px Nunito,sans-serif;border:1.5px solid var(--line);border-radius:10px;padding:0 12px;background:var(--card);color:var(--ink)}
+.fromrow .code{font:600 15px Fredoka,sans-serif;background:var(--card);border:1.5px dashed #6d1a2a;color:#6d1a2a;border-radius:8px;padding:4px 10px}
+.hdrbtns{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.hbtn{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 16px;border-radius:999px;border:1.5px solid #0f2d4a;background:#ffffffd0;color:#0f2d4a;font:600 15px Fredoka,sans-serif;cursor:pointer}
+.hbtn:hover{background:#fff}
+.fbarband{padding-top:20px;padding-bottom:20px}
+.fbar{display:flex;flex-wrap:wrap;align-items:center;gap:12px 16px}
+.fbtn{display:inline-flex;align-items:center;gap:10px;font-size:18px;padding:10px 22px}
+.badge{background:#f2b705;color:#2a1d00;border-radius:999px;min-width:26px;height:26px;display:inline-grid;place-items:center;font-size:14px;padding:0 7px}
+.badge[hidden]{display:none}
+.fsum{color:var(--mute);font-weight:600}
+.reset[hidden]{display:none}
+.fsheet{width:min(720px,100%)}
+.grp{font:600 15px Fredoka,sans-serif;text-transform:none;color:var(--mute);margin:18px 0 8px}
+.fbody{padding:22px clamp(16px,3vw,28px) 24px}
+.fbody h2{margin-right:54px}
+.fsheet .trip,.fsheet .filters{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;margin:0;padding:0;border:0}
+.fsheet .trip{margin-bottom:8px}
+details.cat{background:var(--soft);border-radius:14px;border:1.5px solid var(--line)}
+details.cat[open]{border-color:var(--teal);background:var(--card)}
+details.cat>summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center;padding:12px 16px;min-height:52px}
+details.cat>summary::-webkit-details-marker{display:none}
+details.cat>summary::after{content:"+";font:700 22px Fredoka,sans-serif;color:var(--brand2)}
+details.cat[open]>summary::after{content:"–"}
+.ct{font:600 17px Fredoka,sans-serif;color:var(--brand2)}
+.cv{font-size:14px;color:var(--mute);text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media(max-width:600px){.ct{font-size:16px}}
+details.cat>.f{padding:0 16px 16px}
+details.cat>.f>h3:first-child{display:none}
+details.cat>.f>h3{margin-top:12px}
+.fdone{position:sticky;bottom:0;display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center;margin:16px calc(-1*clamp(16px,3vw,28px)) -24px;padding:14px clamp(16px,3vw,28px);background:var(--card);border-top:1px solid var(--line)}
+.fdone .open{font-size:17px;padding:10px 22px}
+#sov .sugform{margin-top:8px}
+.sugwrap{max-width:760px}
+.sugform{display:grid;gap:12px;margin-top:12px;background:var(--soft);border-radius:18px;padding:18px}
+.sugform label{font-weight:700;font-family:Fredoka,sans-serif;display:block;margin-bottom:4px}
+.sugform input,.sugform select,.sugform textarea{width:100%;font:16px Nunito,sans-serif;border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--card);color:var(--ink)}
+.sugform textarea{min-height:130px;resize:vertical}
+.sugstat{font-weight:700;min-height:1.5em}.sugstat.ok{color:#2f8f57}.sugstat.bad{color:#c4452b}
+.inbox{margin-top:24px;border:2px dashed var(--brand2);border-radius:18px;padding:16px}
+.inbox h3{font-family:Fredoka,sans-serif;margin:0 0 10px;color:var(--brand2)}
+.msg{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-top:8px}
+.msg small{display:block;color:var(--mute)}
+.msg p{margin:4px 0 0;white-space:pre-wrap;overflow-wrap:anywhere}
+.sender{margin-top:14px}.shead,.mhead{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;align-items:center}
+.delbtn{border:1.5px solid #c4452b;color:#c4452b;background:none;border-radius:999px;min-height:40px;padding:0 14px;font:600 14px Fredoka,sans-serif;cursor:pointer}
+.post[data-open],.card h4{cursor:pointer}
+.open{margin-top:4px;min-height:48px;border:0;border-radius:14px;background:#6d1a2a;color:#fff;font:600 16px Fredoka,sans-serif;cursor:pointer;padding:8px 14px}
+.open:hover{background:#86223a}
+.ov{position:fixed;inset:0;z-index:50;background:#0f2d4a99;display:flex;justify-content:center;align-items:flex-start;overflow:hidden;padding:max(2vh,8px) 8px}
+.ov[hidden]{display:none}
+.sheet{position:relative;width:min(860px,100%);max-height:96vh;overflow-y:auto;border-radius:22px;background:var(--card);box-shadow:0 20px 60px #0006}
+.sheet .card{border:0;box-shadow:none;border-radius:0}.sheet .card:hover{transform:none}
+.sheet .post{height:clamp(170px,28vw,260px)}
+.sheet .card h4{font-size:clamp(26px,4vw,34px);cursor:default}
+.x{position:sticky;top:10px;float:right;margin:10px 10px -54px 0;z-index:3;width:44px;height:44px;border-radius:50%;border:0;background:#fffdf6;color:#6d1a2a;font:700 20px Fredoka,sans-serif;cursor:pointer;box-shadow:0 2px 8px #0003}
+.sh{font-family:Fredoka,sans-serif;font-size:22px;margin:18px 0 8px;color:var(--brand2)}
+.gh{font-family:Fredoka,sans-serif;font-weight:600;font-size:17px;margin:14px 0 6px}
+.full .stamp{right:64px}
+.bkgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:8px}
+.bkbtn{display:flex;align-items:center;min-height:48px;padding:8px 14px;border-radius:12px;background:var(--soft);color:var(--ink);text-decoration:none;font-weight:700;border:1.5px solid var(--line)}
+.bkbtn:hover{border-color:var(--teal)}.bkbtn.hl{border-color:#d9822b;background:var(--s2)}
+.offl{margin:0;padding-left:18px}.offl a{color:var(--teal);font-weight:700}
+.tlist{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.tlist li{display:flex;gap:10px;align-items:flex-start;background:var(--soft);border-radius:10px;padding:8px 10px;font-size:15px}
+.mode{flex:none;min-width:84px;text-align:center;border-radius:999px;padding:2px 8px;font:600 13px Fredoka,sans-serif;color:#fff;background:#5b6b7f}
+.m-metro,.m-tram{background:#2a6fb8}.m-train{background:#6d1a2a}.m-bus{background:#2f8f57}.m-ride,.m-tuktuk{background:#c98a00}.m-ferry{background:#1f8fb0}.m-flight{background:#5a4fcf}.m-car,.m-shuttle{background:#bf5b27}.m-tour{background:#8a5a2b}.m-walk{background:#5b6b7f}
+.tlinks{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}.tlinks.big{margin-top:0}
+.tlink{display:inline-flex;align-items:center;min-height:32px;padding:2px 10px;border-radius:999px;border:1.5px solid var(--teal);color:var(--teal);font:600 13px Nunito,sans-serif;text-decoration:none;background:var(--card)}
+.tlink:hover{background:var(--teal);color:#fff}.tlink.srch{border-style:dashed}
+.carbox{border-radius:12px;padding:10px 12px;font-size:15px;background:var(--soft);border-left:5px solid #2f8f57}
+.carbox.car-rec{border-left-color:#c98a00}.carbox.car-need{border-left-color:#c4452b;background:var(--s3)}.carbox.car-drv{border-left-color:#5a4fcf}
+.pill.car-need{background:var(--s3);font-weight:700}.pill.car-rec{background:var(--s1)}.pill.car-drv{background:light-dark(#e4e1fb,#2a2650)}
+@media(max-width:600px){.ov{padding:0}.sheet{max-height:100vh;height:100vh;border-radius:0}.mode{min-width:70px}}
+@media(max-width:700px){.months{grid-template-columns:repeat(6,minmax(0,1fr))}.mo{min-height:64px}}
+@media(prefers-reduced-motion:reduce){.mo{transition:none}}
+.eat{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:10px 0 4px}.eat b{font-family:Fredoka,sans-serif;font-weight:600;color:var(--brand2);margin-right:4px}.eat b::before{content:"🍲 "}.eat span{background:color-mix(in srgb,var(--brand2) 12%,transparent);border-radius:999px;padding:3px 10px;font-size:.85em}
+</style>
+</head>
+<body>
+<header class="band hero"><svg class="scene" viewBox="0 0 1400 520" preserveAspectRatio="xMidYMax slice" aria-hidden="true" id="heroart"></svg><div class="wrap">
+ <div class="top">
+  <div><h1 id="t-title">Destinauta<small>¿Dónde viajar cada mes?</small></h1><p class="sub" id="t-sub"></p></div>
+  <div class="hdrbtns"><button class="hbtn" id="sugBtn"><svg viewBox="0 0 32 32" width="22" height="22" aria-hidden="true"><rect x="3" y="8" width="26" height="18" rx="3" fill="#2a9bb8"/><path d="M3 10l13 9 13-9" fill="none" stroke="#fff" stroke-width="2.5"/><circle cx="26" cy="8" r="5" fill="#f2b705"/></svg><span id="sugBtnT"></span></button>
+ <div class="lang" role="group" aria-label="Language"><button id="l-es" aria-pressed="true">ES</button><button id="l-en" aria-pressed="false">EN</button></div></div>
+ </div>
+ <div class="ed" id="edition"></div>
+</div></header>
+<section class="band ticket"><div class="wrap">
+ <div class="months" id="months"></div>
+ <div class="seasonline" id="seasonline"></div>
+</div></section>
+
+<section class="band panel fbarband"><div class="wrap fbar">
+ <button class="open fbtn" id="fBtn"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M3 5h18l-7 8v6l-4 2v-8z" fill="#fff"/></svg><span id="fBtnT"></span><span class="badge" id="fBadge"></span></button>
+ <span class="fsum" id="fSum"></span>
+ <button class="reset" id="reset"></button>
+</div></section>
+
+
+
+<section class="band" style="padding-top:0"><div class="wrap">
+ <div class="bar"><h2><svg class="ic" viewBox="0 0 32 32"><circle cx="16" cy="16" r="13" fill="#2a9bb8"/><path d="M8 11c4 1 5 4 9 3s3 5 7 5M6 19c3-1 5 1 7 4M19 5c-1 3 2 4 1 7" stroke="#7ed6a0" stroke-width="3" fill="none" stroke-linecap="round"/></svg><span id="count"></span></h2>
+  <label><span class="row" id="t-sort"></span><select id="sort"></select></label></div>
+ <div class="grid" id="results"></div>
+</div></section>
+
+<section class="band panel" id="alertsband"><div class="wrap">
+ <h2><svg class="ic" viewBox="0 0 32 32"><rect x="4" y="9" width="24" height="18" rx="4" fill="#6d1a2a"/><rect x="11" y="4" width="10" height="7" rx="2" fill="none" stroke="#6d1a2a" stroke-width="2.5"/><rect x="4" y="15" width="24" height="3" fill="#f2b705"/></svg><span id="t-alerts"></span></h2>
+ <div class="alerts" id="alerts"></div>
+</div></section>
+
+<datalist id="citylist"></datalist>
+<div id="fov" class="ov" hidden role="dialog" aria-modal="true" aria-labelledby="fTitle"><div class="sheet fsheet"><button class="x" id="fClose" aria-label="Cerrar">✕</button>
+ <div class="fbody"><h2 id="fTitle"></h2><p class="meta" id="fHint"></p><h3 class="grp" id="gTrip"></h3><div class="trip" id="trip"></div><h3 class="grp" id="gFilt"></h3><div class="filters" id="filters"></div>
+ <div class="fdone"><button class="open" id="fDone"></button><button class="reset" id="reset2"></button></div></div></div></div>
+<div id="sov" class="ov" hidden role="dialog" aria-modal="true" aria-labelledby="sugTitle"><div class="sheet fsheet"><button class="x" id="sClose" aria-label="Cerrar">✕</button>
+ <div class="fbody"><h2><svg class="ic" viewBox="0 0 32 32"><rect x="3" y="8" width="26" height="18" rx="3" fill="#2a9bb8"/><path d="M3 10l13 9 13-9" fill="none" stroke="#fff" stroke-width="2.5"/><circle cx="26" cy="8" r="5" fill="#f2b705"/></svg><span id="sugTitle"></span></h2><div id="sugbody"></div><div id="inbox"></div></div></div></div>
+<div id="ov" class="ov" hidden role="dialog" aria-modal="true"><div class="sheet" id="sheet"></div></div>
+<footer class="band"><div class="wrap" id="foot"></div></footer>
+
+<script>
+{
+const T={
+es:{priv:"Política de privacidad",title:"Destinauta: ¿Dónde viajar cada mes?",sub:"Busca destinos por clima y temporada, riesgos naturales y de seguridad, documentos necesarios con pasaporte español y lo que hay cerca. Los datos se revisan cada estación.",
+edition:(e,r,n)=>`Datos: ${e} · revisados el ${r} · próxima actualización: ${n}`,
+months:["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"],
+mfull:["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"],
+seasons:{win:"Invierno",spr:"Primavera",sum:"Verano",aut:"Otoño"},
+seasonNote:(m,s)=>`Viajas en <b>${m}</b> · ${s} en el hemisferio norte (al revés en el sur)`,
+temp:"Temperatura",tempO:{any:"Cualquiera",cold:"Frío <10°",cool:"Fresco 10–17°",mild:"Templado 18–24°",warm:"Cálido 25–30°",hot:"Caluroso >30°"},
+rain:"Lluvia",rainO:{any:"Me da igual",some:"Poca lluvia",dry:"Seco"},
+hz:"Riesgos naturales",hzO:{any:"Mostrar todo",avoid:"Evitar temporada de riesgo",strict:"Evitar cualquier riesgo alto"},
+docs:"Documentos (máximo trámite)",docO:["Solo DNI","Pasaporte","Autorización online","Visado a la llegada / e-visa"],
+near:"Qué hay cerca",nearO:{beach:"Playa",mountain:"Montaña",city:"Gran ciudad",islands:"Islas",desert:"Desierto",forest:"Selva y bosque",lake:"Lagos"},
+style:"Tipo de viaje",styleO:{culture:"Cultura",food:"Gastronomía",nature:"Naturaleza",wildlife:"Fauna",adventure:"Aventura",hiking:"Senderismo",diving:"Buceo",snow:"Nieve",aurora:"Auroras",family:"Familia",romantic:"Romántico",shopping:"Compras",surf:"Surf",music:"Música"},
+flight:"Duración máxima del vuelo",hours:h=>`${h} h`,anyH:"Sin límite",
+budget:"Presupuesto",budO:["€","€€","€€€"],
+cont:"Continente",contO:{all:"Todos",eu:"Europa",af:"África",as:"Asia y Oriente Medio",na:"Norteamérica",ca:"Centroamérica y Caribe",sa:"Sudamérica",oc:"Oceanía"},
+search:"Buscar",searchPh:"País, ciudad o actividad…",reset:"Borrar filtros",
+alerts:"Novedades de esta temporada",picks:"Recomendados esta temporada",
+count:n=>n===1?"1 destino":`${n} destinos`,sort:"Ordenar",sortO:{best:"Mejor para ese mes",total:"Presupuesto total más bajo",flight:"Vuelo más corto",warm:"Más cálido",cheap:"Destino más económico"},
+ideal:"Ideal en este mes",hi:"Máx.",rd:"Días lluvia",fl:"Vuelo",drv:"En coche",bud:"Gasto",
+noHz:"Sin riesgos de temporada este mes",year:"todo el año",
+more:"Clima, riesgos y detalles",tempRow:"°C máx.",rainRow:"Lluvia",riskRow:"Riesgo",
+sugT:"Buzón de sugerencias",sugBtn:"Sugerencias",fBtn:"Filtros y opciones",gTrip:"Tu viaje y presupuesto",gFilt:"Filtros de destino",fTitle:"Filtros y opciones",fHint:"Abre cada categoría y elige lo que quieras. Los resultados se actualizan al momento.",fDone:n=>n===1?"Ver 1 destino":`Ver ${n} destinos`,fNone:"Sin filtros: se muestran todos los destinos.",fAct:n=>n===1?"1 filtro activo":`${n} filtros activos`,sugIntro:"¿Echas en falta un destino, has visto un dato que hay que corregir o tienes una idea para la app? Escríbela aquí y envíala por correo a Destinauta.",sugTo:"Correo de Destinauta",sugOpen:"Abrir en mi correo",sugCopyA:"Copiar dirección",sugCopyM:"Copiar mensaje",sugCopied:"Copiado. Pégalo en tu correo.",sugCopyFail:"No se ha podido copiar; selecciónalo y cópialo a mano.",sugHow:"Si al pulsar «Abrir en mi correo» no pasa nada, copia la dirección y el mensaje y envíalo desde tu correo habitual.",sugSubj:"Sugerencia para Destinauta",sugNameL:"Nombre",sugTopicL:"Tema",sugTopic:"Tema",sugTopics:{dest:"Nuevo destino",fix:"Corregir un dato",idea:"Idea para la app",other:"Otro"},sugName:"Tu nombre (opcional)",sugMsg:"Tu sugerencia",sugSend:"Enviar sugerencia",sugOk:"¡Gracias! Tu sugerencia se ha guardado.",sugErr:"No se ha podido enviar. Inténtalo de nuevo en un momento.",sugNoPerm:"Tu acceso a esta página es solo de lectura, así que no puedes enviar sugerencias. Pide a la autora acceso de colaborador.",sugSignin:"Para enviar una sugerencia, abre Destinauta en su web e inicia sesión en Claude.",sugOffline:"El buzón solo funciona en la versión web de Destinauta:",sugEmpty:"Escribe tu sugerencia antes de enviarla.",sugMine:n=>n===1?"Has enviado 1 sugerencia.":`Has enviado ${n} sugerencias.`,
+sugFull:"El buzón está lleno (10 sugerencias). Vuelve a intentarlo más adelante, cuando la autora las haya revisado.",sugLeft:n=>n===1?"Queda 1 hueco libre en el buzón.":`Quedan ${n} huecos libres en el buzón.`,inboxCap:(n,m)=>`${n} de ${m} huecos ocupados. Borra las que ya hayas revisado para dejar sitio.`,msgDel:"Borrar",
+inboxT:"Tu buzón (solo lo ves tú · también te llega por correo cada noche)",inboxEmpty:"Todavía no hay sugerencias.",inboxDel:"Borrar las de esta persona",inboxConf:"Pulsa otra vez para confirmar",inboxAnon:"Anónimo",inboxCount:n=>n===1?"1 sugerencia":`${n} sugerencias`,inboxLoading:"Cargando el buzón…",inboxSlow:"El buzón tarda en responder; los datos pueden no estar al día.",
+openD:"Abrir destino: transporte y reservas",close:"Cerrar",origin:"Salgo desde",otherO:"Otra ciudad o aeropuerto",iataPh:"Escribe una ciudad, p. ej. Oporto",bookFrom:"Reservar desde",bookFromPh:"Ciudad o código de aeropuerto",skyNeed:"Para Skyscanner hace falta reconocer el aeropuerto: prueba con otro nombre de la ciudad o con su código (p. ej. OPO).",
+car:"¿Necesito coche?",carO:{no:"Sin coche",rec:"Coche recomendable",need:"Coche imprescindible",drv:"Mejor con conductor"},carF:{any:"Me da igual",noneed:"Sin coche imprescindible",nodrive:"No quiero conducir"},
+book:"Reservar",bookNote:"Enlaces a webs externas con tu búsqueda ya preparada. Compara precios y revisa las condiciones; Destinauta no tiene relación con estas webs.",
+bk:{dircar:"Cómo llegar en coche (Google Maps)",dirap:"Del aeropuerto al centro (Google Maps)",sky:"Vuelos (Skyscanner)",gf:"Vuelos (Google Flights)",hotel:"Alojamiento (Booking)",act:"Actividades (GetYourGuide)",rent:"Alquiler de coche (Rentalcars)",r2r:"Rutas y transporte (Rome2rio)",map:"Mapa (Google Maps)"},
+official:"Trámites oficiales (evita intermediarios que cobran de más)",exteriores2:"Recomendaciones de Exteriores",registro:"Registro de Viajeros (Exteriores)",
+move:"Cómo moverte",byCar:"En coche desde España",web:"Web",srch:"Buscar",exT:"Excursiones y taxis",taxiMap:"Taxis en el mapa",fromAp:"Desde y hasta el aeropuerto",inCity:"Por la ciudad",nearby:"Alrededores y excursiones",apps:"Apps de transporte",apLabel:"Aeropuerto principal",
+modes:{metro:"Metro",train:"Tren",bus:"Bus",ride:"Taxi / app",tram:"Tranvía",walk:"A pie",ferry:"Barco",flight:"Avión",car:"Coche",tour:"Excursión",tuktuk:"Tuk-tuk",shuttle:"Traslado"},
+info:"Información del destino",fromO:o=>`desde ${o}`,origNote:o=>`Vuelos y precios estimados desde ${o}. Las conexiones desde aeropuertos pequeños suelen añadir una escala.`,otherNote:"Para otros aeropuertos, la duración y el precio del vuelo se calculan como desde Madrid.",groundNote:"El viaje por tierra (tren, autobús, ferry o coche) está calculado desde Madrid.",
+sec:"Seguridad y situación política",secO:["","Precauciones normales","Precaución: zonas a evitar","Alta precaución","Exteriores aconseja aplazar el viaje"],secF:{any:"Mostrar todo",no4:"Sin aviso de aplazar viaje",max2:"Como mucho zonas a evitar",only1:"Solo precauciones normales"},
+health:"Salud",eat:"Comida típica",vx:"Vacunas",vxReq:"Obligatorias desde España",vxRec:"Recomendadas",vxNone:"ninguna",vxRoutine:"solo el calendario habitual al día",yfc:"Certificado de fiebre amarilla obligatorio si llegas desde un país con riesgo (o tras una escala larga en él)",mal:["Sin malaria","Malaria solo en algunas zonas","Malaria: profilaxis recomendada"],vxNote:"Pide cita en un Centro de Vacunación Internacional (Sanidad Exterior) 4–8 semanas antes del viaje.",noVx:"Sin vacunas obligatorias",vxF:"Vacunas",hrF:"Riesgos de salud que quiero evitar",hrO:{mal:"Malaria",den:"Dengue",chik:"Chikungunya",zika:"Zika",yf:"Fiebre amarilla",rab:"Rabia",chol:"Cólera",je:"Encefalitis japonesa",tbe:"Encefalitis por garrapatas",alt:"Mal de altura"},hrT:"Riesgos de salud",hrNone:"ninguno destacable",zikaN:"Zika: desaconsejado en el embarazo y si buscas embarazo.",lang:"Idioma",cur:"Moneda",tz:"Diferencia horaria",
+exteriores:"Recomendaciones de viaje de Exteriores",empty:"Ningún destino cumple todos los filtros. Prueba a quitar alguno (por ejemplo, «Cómo llegar»: en coche propio o por tierra solo se llega a algunos destinos).",
+foot:"Datos orientativos para titulares de pasaporte español: clima medio histórico y riesgos recurrentes, no previsiones. Comprueba siempre los requisitos y avisos oficiales antes de reservar.",
+loadErr:"No se han podido cargar los datos. Recarga la página.",
+tripH:"Tu viaje",days:"Días de estancia",pax:"Viajeros",opt:{go:["Cómo llegar",{eco:"Avión, turista",prem:"Avión, turista prémium",bus:"Avión, business",ground:"Tren, autobús o ferry",own:"Vehículo propio (coche)"}],stay:["Alojamiento",{hostel:"Albergue",budget:"Hotel económico",mid:"Hotel medio",apt:"Apartamento",lux:"Hotel de lujo",ai:"Resort todo incluido"}],food:["Comida",{self:"Cocinar / supermercado",menu:"Restaurantes con menú del día",local:"Comida local y callejera",rest:"Restaurantes",fine:"Alta cocina"}],move:["Transporte local",{none:"A pie",pub:"Transporte público",taxi:"Taxi / VTC",car:"Coche de alquiler",driver:"Conductor privado / tours"}],act:["Actividades y entradas",{none:"Ninguna",some:"Algunas",lots:"Muchas"}],ins:["Seguro de viaje",{yes:"Sí",no:"No"}]},
+groundNA:"Sin tren, autobús ni ferry razonable desde Madrid: se calcula en avión turista.",ownNA:"No se puede llegar en coche desde España de forma razonable: se calcula en avión turista.",ownNote:(km,h,f)=>`En coche propio desde Madrid: unos ${km.toLocaleString("es-ES")} km y ${h} h de conducción por trayecto${f?", con ferry incluido":""}. Incluye gasolina y peajes aproximados por coche (hasta 5 personas).`,ownRent:"Con tu propio coche no se cuenta alquiler: solo gasolina y aparcamiento en destino.",menuNote:"Menú del día: en muchos países hay un equivalente (plat du jour, menu fisso, comida corrida, almuerzo ejecutivo, set lunch).",maxB:"Presupuesto máximo total (€)",maxPh:"Sin límite",
+costT:(n,p)=>`Presupuesto aprox. · ${n} ${n===1?"día":"días"} · ${p} ${p===1?"persona":"personas"}`,costNote:"Estimación orientativa con precios medios. Julio, agosto y diciembre encarecen el viaje de ida y vuelta un 25 %.",entry:"Trámites de entrada",trip:"Viaje ida y vuelta",perP:"por persona"},
+en:{priv:"Privacy policy",title:"Destinauta: Where to travel each month?",sub:"Find destinations by climate and season, natural and security risks, documents needed on a Spanish passport, and what's nearby. The data is reviewed every season.",
+edition:(e,r,n)=>`Data: ${e} · reviewed ${r} · next update: ${n}`,
+months:["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
+mfull:["January","February","March","April","May","June","July","August","September","October","November","December"],
+seasons:{win:"Winter",spr:"Spring",sum:"Summer",aut:"Autumn"},
+seasonNote:(m,s)=>`Travelling in <b>${m}</b> · ${s} in the northern hemisphere (reversed in the south)`,
+temp:"Temperature",tempO:{any:"Any",cold:"Cold <10°",cool:"Cool 10–17°",mild:"Mild 18–24°",warm:"Warm 25–30°",hot:"Hot >30°"},
+rain:"Rain",rainO:{any:"Don't mind",some:"Little rain",dry:"Dry"},
+hz:"Natural hazards",hzO:{any:"Show all",avoid:"Avoid hazard season",strict:"Avoid any high risk"},
+docs:"Documents (most paperwork I'll accept)",docO:["ID card only","Passport","Online authorisation","Visa on arrival / e-visa"],
+near:"What's nearby",nearO:{beach:"Beach",mountain:"Mountains",city:"Big city",islands:"Islands",desert:"Desert",forest:"Jungle & forest",lake:"Lakes"},
+style:"Trip style",styleO:{culture:"Culture",food:"Food",nature:"Nature",wildlife:"Wildlife",adventure:"Adventure",hiking:"Hiking",diving:"Diving",snow:"Snow",aurora:"Northern lights",family:"Family",romantic:"Romantic",shopping:"Shopping",surf:"Surf",music:"Music"},
+flight:"Maximum flight time",hours:h=>`${h} h`,anyH:"No limit",
+budget:"Budget",budO:["€","€€","€€€"],
+cont:"Continent",contO:{all:"All",eu:"Europe",af:"Africa",as:"Asia & Middle East",na:"North America",ca:"Central America & Caribbean",sa:"South America",oc:"Oceania"},
+search:"Search",searchPh:"Country, city or activity…",reset:"Clear filters",
+alerts:"What's new this season",picks:"This season's picks",
+count:n=>n===1?"1 destination":`${n} destinations`,sort:"Sort by",sortO:{best:"Best for that month",total:"Lowest total budget",flight:"Shortest flight",warm:"Warmest",cheap:"Cheapest destination"},
+ideal:"Ideal this month",hi:"High",rd:"Rain days",fl:"Flight",drv:"By car",bud:"Cost",
+noHz:"No seasonal hazards this month",year:"all year",
+more:"Climate, hazards and details",tempRow:"°C high",rainRow:"Rain",riskRow:"Risk",
+sugT:"Suggestion box",sugBtn:"Suggestions",fBtn:"Filters & options",gTrip:"Your trip & budget",gFilt:"Destination filters",fTitle:"Filters & options",fHint:"Open each category and choose what you like. Results update instantly.",fDone:n=>n===1?"Show 1 destination":`Show ${n} destinations`,fNone:"No filters: all destinations are shown.",fAct:n=>n===1?"1 active filter":`${n} active filters`,sugIntro:"Missing a destination, spotted something to correct, or have an idea for the app? Write it here and send it to Destinauta by email.",sugTo:"Destinauta's email",sugOpen:"Open in my email",sugCopyA:"Copy address",sugCopyM:"Copy message",sugCopied:"Copied. Paste it into your email.",sugCopyFail:"Couldn't copy; please select it and copy it by hand.",sugHow:"If nothing happens when you tap \"Open in my email\", copy the address and the message and send it from your usual email.",sugSubj:"Suggestion for Destinauta",sugNameL:"Name",sugTopicL:"Topic",sugTopic:"Topic",sugTopics:{dest:"New destination",fix:"Correct some information",idea:"Idea for the app",other:"Other"},sugName:"Your name (optional)",sugMsg:"Your suggestion",sugSend:"Send suggestion",sugOk:"Thank you! Your suggestion has been saved.",sugErr:"It couldn't be sent. Please try again in a moment.",sugNoPerm:"Your access to this page is view-only, so you can't send suggestions. Ask the author for Contributor access.",sugSignin:"To send a suggestion, open Destinauta on the web and sign in to Claude.",sugOffline:"The suggestion box only works in the web version of Destinauta:",sugEmpty:"Please write your suggestion before sending.",sugMine:n=>n===1?"You have sent 1 suggestion.":`You have sent ${n} suggestions.`,
+sugFull:"The suggestion box is full (10 suggestions). Please try again later, once the author has reviewed them.",sugLeft:n=>n===1?"1 free space left in the box.":`${n} free spaces left in the box.`,inboxCap:(n,m)=>`${n} of ${m} spaces used. Delete the ones you have reviewed to make room.`,msgDel:"Delete",
+inboxT:"Your inbox (only you can see this · also emailed to you every evening)",inboxEmpty:"No suggestions yet.",inboxDel:"Delete this person's messages",inboxConf:"Tap again to confirm",inboxAnon:"Anonymous",inboxCount:n=>n===1?"1 suggestion":`${n} suggestions`,inboxLoading:"Loading the inbox…",inboxSlow:"The inbox is slow to respond; data may be out of date.",
+openD:"Open destination: transport & booking",close:"Close",origin:"Flying from",otherO:"Other city or airport",iataPh:"Type a city, e.g. Porto",bookFrom:"Book from",bookFromPh:"City or airport code",skyNeed:"Skyscanner needs a recognised airport: try another spelling of the city or its code (e.g. OPO).",
+car:"Do I need a car?",carO:{no:"No car needed",rec:"Car recommended",need:"Car essential",drv:"Best with a driver"},carF:{any:"Don't mind",noneed:"No car essential",nodrive:"I don't want to drive"},
+book:"Book",bookNote:"Links to external sites with your search pre-filled. Compare prices and check the terms; Destinauta is not affiliated with these sites.",
+bk:{dircar:"Driving directions (Google Maps)",dirap:"From the airport to the centre (Google Maps)",sky:"Flights (Skyscanner)",gf:"Flights (Google Flights)",hotel:"Accommodation (Booking)",act:"Activities (GetYourGuide)",rent:"Car hire (Rentalcars)",r2r:"Routes & transport (Rome2rio)",map:"Map (Google Maps)"},
+official:"Official paperwork (avoid middlemen who overcharge)",exteriores2:"Spanish Foreign Ministry advice",registro:"Travellers' Register (Spanish Foreign Ministry)",
+move:"Getting around",byCar:"By car from Spain",web:"Website",srch:"Search",exT:"Excursions & taxis",taxiMap:"Taxis on the map",fromAp:"To and from the airport",inCity:"Around the city",nearby:"Nearby & day trips",apps:"Transport apps",apLabel:"Main airport",
+modes:{metro:"Metro",train:"Train",bus:"Bus",ride:"Taxi / app",tram:"Tram",walk:"On foot",ferry:"Boat",flight:"Flight",car:"Car",tour:"Tour",tuktuk:"Tuk-tuk",shuttle:"Transfer"},
+info:"Destination details",fromO:o=>`from ${o}`,origNote:o=>`Flights and prices estimated from ${o}. Smaller airports usually add a connection.`,otherNote:"For other airports, flight time and price are estimated as from Madrid.",groundNote:"Overland travel (train, bus, ferry or car) is estimated from Madrid.",
+sec:"Security & political situation",secO:["","Normal precautions","Caution: areas to avoid","High caution","Spain advises postponing travel"],secF:{any:"Show all",no4:"No \"postpone travel\" warnings",max2:"At most areas to avoid",only1:"Normal precautions only"},
+health:"Health",eat:"Local food to try",vx:"Vaccines",vxReq:"Required from Spain",vxRec:"Recommended",vxNone:"none",vxRoutine:"just routine vaccines up to date",yfc:"Yellow fever certificate required if arriving from a risk country (or after a long layover in one)",mal:["No malaria","Malaria in some areas only","Malaria: prophylaxis advised"],vxNote:"Book an International Vaccination Centre (Sanidad Exterior) 4–8 weeks before travelling.",noVx:"No mandatory vaccines",vxF:"Vaccines",hrF:"Health risks I want to avoid",hrO:{mal:"Malaria",den:"Dengue",chik:"Chikungunya",zika:"Zika",yf:"Yellow fever",rab:"Rabies",chol:"Cholera",je:"Japanese encephalitis",tbe:"Tick-borne encephalitis",alt:"Altitude sickness"},hrT:"Health risks",hrNone:"none of note",zikaN:"Zika: not advised during pregnancy or if trying to conceive.",lang:"Language",cur:"Currency",tz:"Time difference",
+exteriores:"Spanish Foreign Ministry travel advice",empty:"No destination matches every filter. Try removing one (for example \"Getting there\": only some destinations can be reached by own car or overland).",
+foot:"Guidance for Spanish passport holders: historical average climate and recurring hazards, not forecasts. Always check official requirements and advisories before booking.",
+loadErr:"The data could not be loaded. Please reload the page.",
+tripH:"Your trip",days:"Days of stay",pax:"Travellers",opt:{go:["Getting there",{eco:"Flight, economy",prem:"Flight, premium economy",bus:"Flight, business",ground:"Train, bus or ferry",own:"Own vehicle (car)"}],stay:["Accommodation",{hostel:"Hostel",budget:"Budget hotel",mid:"Mid-range hotel",apt:"Apartment",lux:"Luxury hotel",ai:"All-inclusive resort"}],food:["Food",{self:"Self-catering",menu:"Restaurants with menú del día (set lunch)",local:"Local & street food",rest:"Restaurants",fine:"Fine dining"}],move:["Local transport",{none:"On foot",pub:"Public transport",taxi:"Taxi / ride-hailing",car:"Rental car",driver:"Private driver / tours"}],act:["Activities & tickets",{none:"None",some:"Some",lots:"Lots"}],ins:["Travel insurance",{yes:"Yes",no:"No"}]},
+groundNA:"No sensible train, bus or ferry from Madrid: priced as an economy flight.",ownNA:"You can't reasonably drive there from Spain: priced as an economy flight.",ownNote:(km,h,f)=>`By own car from Madrid: about ${km.toLocaleString("en-GB")} km and ${h} h of driving each way${f?", ferry included":""}. Includes approximate fuel and tolls per car (up to 5 people).`,ownRent:"With your own car no rental is counted: only fuel and parking at the destination.",menuNote:"Menú del día: many countries have an equivalent (plat du jour, menu fisso, comida corrida, almuerzo ejecutivo, set lunch).",maxB:"Maximum total budget (€)",maxPh:"No limit",
+costT:(n,p)=>`Approx. budget · ${n} ${n===1?"day":"days"} · ${p} ${p===1?"person":"people"}`,costNote:"Rough estimate at average prices. July, August and December make the return journey about 25% dearer.",entry:"Entry paperwork",trip:"Return journey",perP:"per person"}};
+const HZ={es:{fire:"Incendios forestales",quake:"Terremotos",volc:"Actividad volcánica",heat:"Calor extremo",flood:"Inundaciones",rain:"Lluvias monzónicas",typh:"Tifones",hur:"Huracanes",storm:"Temporales",snow:"Nevadas y aludes",cold:"Frío extremo",dust:"Polvo y arena",air:"Contaminación",sarg:"Sargazo",cyc:"Ciclones"},
+en:{fire:"Wildfires",quake:"Earthquakes",volc:"Volcanic activity",heat:"Extreme heat",flood:"Floods",rain:"Monsoon rains",typh:"Typhoons",hur:"Hurricanes",storm:"Storms",snow:"Snowstorms & avalanches",cold:"Extreme cold",dust:"Dust & sandstorms",air:"Air pollution",sarg:"Sargassum seaweed",cyc:"Cyclones"}};
+const VX={es:{yf:"fiebre amarilla",hepA:"hepatitis A",hepB:"hepatitis B",typh:"fiebre tifoidea",rab:"rabia",je:"encefalitis japonesa",tbe:"encefalitis por garrapatas"},en:{yf:"yellow fever",hepA:"hepatitis A",hepB:"hepatitis B",typh:"typhoid",rab:"rabies",je:"Japanese encephalitis",tbe:"tick-borne encephalitis"}};
+const SEAS=["win","win","spr","spr","spr","sum","sum","sum","aut","aut","aut","win"];
+const SCOL={win:"var(--win)",spr:"var(--spr)",sum:"var(--sum)",aut:"var(--aut)"};
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const $=id=>document.getElementById(id);
+const store={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const DEF=()=>({m:new Date().getMonth(),temp:"any",rain:"any",hz:"any",doc:3,near:[],style:[],flight:24,bud:3,cont:"all",q:"",sort:"best",days:7,pax:2,go:"eco",stay:"mid",food:"local",move:"pub",act:"some",ins:"yes",maxB:"",vxf:"any",secf:"any",hrisk:[],orig:"MAD",oiata:"",carf:"any"});
+let S=Object.assign(DEF(),store.get("rumbo-f")||{});if(!["all","eu","af","as","na","ca","sa","oc"].includes(S.cont))S.cont="all";
+let L=store.get("rumbo-l")||((navigator.language||"es").startsWith("es")?"es":"en");
+let D=null;
+
+const inM=(h,m)=>{const a=h[1],b=h[2],x=m+1;return a<=b?x>=a&&x<=b:x>=a||x<=b};
+const yearRound=h=>h[1]===1&&h[2]===12;
+const tband=t=>t<10?"cold":t<18?"cool":t<25?"mild":t<=30?"warm":"hot";
+const active=(d,m)=>d.hz.filter(h=>inM(h,m));
+const isIdeal=(d,m)=>d.sec.l<=2&&d.hi[m]>=20&&d.hi[m]<=31&&d.rd[m]<=6&&!active(d,m).some(h=>!yearRound(h)&&h[3]>=2);
+const score=(d,m)=>{let s=100-Math.abs(d.hi[m]-25)*2.2-d.rd[m]*2.5;for(const h of active(d,m))s-=yearRound(h)?h[3]*2:h[3]*12;if(isIdeal(d,m))s+=15;s-=[0,0,4,25,70][d.sec.l];return s};
+const ORIG=[["MAD","Madrid"],["BCN","Barcelona"],["VLC","Valencia"],["AGP","Málaga"],["SVQ","Sevilla"],["ALC","Alicante"],["BIO","Bilbao"],["PMI","Palma de Mallorca"],["IBZ","Ibiza"],["SCQ","Santiago de Compostela"],["OVD","Asturias"],["ZAZ","Zaragoza"],["LPA","Gran Canaria"],["TFN","Tenerife Norte"],["other",""]];
+const CITIES=[["MAD","Madrid"],["BCN","Barcelona"],["VLC","Valencia"],["AGP","Málaga","Malaga"],["SVQ","Sevilla","Seville"],["ALC","Alicante"],["BIO","Bilbao"],["PMI","Palma de Mallorca","Palma","Mallorca","Majorca"],["IBZ","Ibiza"],["MAH","Menorca","Mahón","Mahon"],["SCQ","Santiago de Compostela"],["LCG","A Coruña","La Coruña","Coruña","Coruna"],["VGO","Vigo"],["OVD","Asturias","Oviedo","Gijón","Gijon"],["SDR","Santander"],["ZAZ","Zaragoza"],["GRX","Granada"],["LEI","Almería","Almeria"],["RMU","Murcia"],["XRY","Jerez"],["VLL","Valladolid"],["PNA","Pamplona"],["EAS","San Sebastián","San Sebastian","Donostia"],["VIT","Vitoria"],["LPA","Gran Canaria","Las Palmas"],["TFN","Tenerife Norte","Tenerife"],["ACE","Lanzarote"],["FUE","Fuerteventura"],["SPC","La Palma"],["GRO","Girona","Gerona"],["REU","Reus","Tarragona"],["BJZ","Badajoz"],["MLN","Melilla"],
+["LIS","Lisboa","Lisbon"],["OPO","Oporto","Porto"],["FAO","Faro"],["PAR","París","Paris"],["LON","Londres","London"],["ROM","Roma","Rome"],["MIL","Milán","Milan"],["VCE","Venecia","Venice"],["NAP","Nápoles","Naples"],["BER","Berlín","Berlin"],["MUC","Múnich","Munich"],["FRA","Fráncfort","Frankfurt"],["DUS","Düsseldorf","Dusseldorf"],["HAM","Hamburgo","Hamburg"],["AMS","Ámsterdam","Amsterdam"],["BRU","Bruselas","Brussels"],["DUB","Dublín","Dublin"],["ZRH","Zúrich","Zurich"],["GVA","Ginebra","Geneva"],["VIE","Viena","Vienna"],["PRG","Praga","Prague"],["WAW","Varsovia","Warsaw"],["BUD","Budapest"],["ATH","Atenas","Athens"],["IST","Estambul","Istanbul"],["CPH","Copenhague","Copenhagen"],["STO","Estocolmo","Stockholm"],["OSL","Oslo"],["HEL","Helsinki"],["EDI","Edimburgo","Edinburgh"],["MAN","Mánchester","Manchester"],["OTP","Bucarest","Bucharest"],["SOF","Sofía","Sofia"],["MRS","Marsella","Marseille"],["NCE","Niza","Nice"],["LYS","Lyon"],["GVA","Ginebra"],
+["NYC","Nueva York","New York"],["MIA","Miami"],["LAX","Los Ángeles","Los Angeles"],["CHI","Chicago"],["YTO","Toronto"],["YMQ","Montreal"],["MEX","Ciudad de México","Mexico City","México","Mexico"],["CUN","Cancún","Cancun"],["BOG","Bogotá","Bogota"],["MDE","Medellín","Medellin"],["LIM","Lima"],["BUE","Buenos Aires"],["SCL","Santiago de Chile"],["SAO","São Paulo","Sao Paulo"],["RIO","Río de Janeiro","Rio de Janeiro"],["CCS","Caracas"],["UIO","Quito"],["GYE","Guayaquil"],["MVD","Montevideo"],["HAV","La Habana","Havana"],["SDQ","Santo Domingo"],["PTY","Panamá","Panama"],["SJO","San José","San Jose"],
+["RAK","Marrakech"],["CMN","Casablanca"],["TNG","Tánger","Tangier"],["CAI","El Cairo","Cairo"],["DXB","Dubái","Dubai"],["DOH","Doha"],["TLV","Tel Aviv"],["JNB","Johannesburgo","Johannesburg"],["TYO","Tokio","Tokyo"],["SEL","Seúl","Seoul"],["BJS","Pekín","Beijing"],["SHA","Shanghái","Shanghai"],["HKG","Hong Kong"],["BKK","Bangkok"],["SIN","Singapur","Singapore"],["KUL","Kuala Lumpur"],["DEL","Delhi","Nueva Delhi","New Delhi"],["BOM","Bombay","Mumbai"],["SYD","Sídney","Sydney"],["MEL","Melbourne"]];
+const norm=x=>String(x||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z ]/g," ").replace(/\s+/g," ").trim();
+function resolveCity(txt){const n=norm(txt);if(!n)return null;
+ const raw=String(txt).trim();if(/^[A-Za-z]{3}$/.test(raw)){const up=raw.toUpperCase();const hit=CITIES.find(c=>c[0]===up);if(hit||!CITIES.some(c=>c.slice(1).some(v=>norm(v)===n)))return{code:up,name:hit?hit[1]:up}}
+ for(const c of CITIES)if(c.slice(1).some(v=>norm(v)===n))return{code:c[0],name:c[1]};
+ for(const c of CITIES)if(c.slice(1).some(v=>norm(v).startsWith(n)&&n.length>=4))return{code:c[0],name:c[1]};
+ return null}
+const oRes=()=>S.orig==="other"?resolveCity(S.oiata):null;
+const oCode=()=>{if(S.orig!=="other")return S.orig;const r=oRes();return r?r.code:null};
+const oName=()=>{if(S.orig==="other"){const r=oRes();return r?r.name:(String(S.oiata||"").trim()||"Madrid")}const o=ORIG.find(x=>x[0]===S.orig);return o?o[1]:"Madrid"};
+function setOrigin(txt){const r=resolveCity(txt);const known=r&&ORIG.find(x=>x[0]===r.code&&x[0]!=="other");
+ if(known){S.orig=r.code;S.oiata=""}else if(String(txt||"").trim()){S.orig="other";S.oiata=String(txt).trim().slice(0,60)}else{S.orig="MAD";S.oiata=""}}
+const SPAIN=new Set(CITIES.slice(0,33).map(c=>c[0]));
+const CANI=new Set(["tenerife","grancanaria","lanzarote","fuerteventura","lapalma","lagomera","elhierro"]),CANO=new Set(["LPA","TFN","TFS","ACE","FUE","SPC","GMZ","VDE"]);
+const fAdj=d=>{const o=S.orig==="other"?(oCode()||"MAD"):S.orig;if(o==="MAD"||o==="BCN"||(!SPAIN.has(o)&&!CANO.has(o)))return{h:0,e:0};const can=CANO.has(o);
+ if(CANI.has(d.id))return can?{h:Math.max(0.5,d.f-2.3)-d.f,e:-90}:{h:0,e:0};
+ if(can)return d.f>4.5?{h:2,e:90}:{h:1.5,e:60};
+ return d.f>4.5?{h:1.5,e:70}:{h:0,e:10}};
+const fH=d=>Math.max(0.5,Math.round((d.f+fAdj(d).h)*2)/2);
+const OPTK=["go","stay","food","move","act","ins"];
+const cost=(d,m)=>{const c=d.cost,days=Math.max(1,Math.min(90,Math.round(+S.days)||7)),pax=Math.max(1,Math.min(12,Math.round(+S.pax)||1)),pi=c.day/106,nights=Math.max(1,days-1);
+const peak=[6,7,11].includes(m)?1.25:1,rooms=Math.ceil(pax/2),cars=Math.ceil(pax/5);
+let gNA=false,oNA=false,own=null,go;
+const fl=Math.max(40,c.fl+fAdj(d).e);
+if(S.go==="own"){if(c.km){go=(c.km*0.16*2*peak+(c.ferry||0)*peak)*cars;own={km:c.km,h:Math.max(1,Math.round(c.km/85)),f:!!c.ferry}}else{oNA=true;go=fl*pax*peak}}
+else if(S.go==="ground"){if(c.gr)go=c.gr*pax*peak;else{gNA=true;go=fl*pax*peak}}else go=fl*({eco:1,prem:2.2,bus:4}[S.go]||1)*pax*peak;
+const stay=({hostel:25*pax,budget:60*rooms,mid:110*rooms,apt:Math.max(90,120*Math.ceil(pax/4)),lux:280*rooms,ai:220*pax}[S.stay]||110*rooms)*pi*nights;
+const food=S.stay==="ai"?0:({self:18,menu:25,local:30,rest:55,fine:100}[S.food]||30)*pi*days*pax;
+const move=own&&S.move==="car"?20*cars*days:({none:0,pub:6*pax,taxi:22*rooms,car:70*cars,driver:90*Math.ceil(pax/4)}[S.move]??6*pax)*pi*days;
+const act=({none:0,some:15,lots:40}[S.act]??15)*pi*days*pax;
+const ins=S.ins==="no"?0:(15+1.5*days)*pax,fe=c.fee*pax;
+const tot=go+stay+food+move+act+ins+fe;
+return{parts:[["go",go],["stay",stay],["food",food],["move",move],["act",act],["ins",ins],["entry",fe]],gNA,oNA,own,tot,lo:tot*.85,hi:tot*1.2,days,pax}};
+const eur=v=>new Intl.NumberFormat(L==="es"?"es-ES":"en-GB",{style:"currency",currency:"EUR",maximumFractionDigits:0}).format(Math.round(v/10)*10);
+const fmtDate=s=>{const [y,mo,da]=s.split("-").map(Number);return `${da} ${T[L].mfull[mo-1]} ${y}`};
+
+function chips(key,opts,multi){return `<div class="chips">${Object.entries(opts).map(([v,l])=>{const on=multi?S[key].includes(v):String(S[key])===v;return `<button class="chip" data-k="${key}" data-v="${v}" data-multi="${multi?1:0}" aria-pressed="${on}">${esc(l)}</button>`}).join("")}</div>`}
+function renderFilters(){const t=T[L];
+$("filters").innerHTML=`
+<div class="f"><h3>${t.temp}</h3>${chips("temp",t.tempO)}</div>
+<div class="f"><h3>${t.rain}</h3>${chips("rain",t.rainO)}</div>
+<div class="f"><h3>${t.hz}</h3>${chips("hz",t.hzO)}</div>
+<div class="f"><h3>${t.sec}</h3>${chips("secf",t.secF)}</div>
+<div class="f"><h3>${t.car}</h3>${chips("carf",t.carF)}</div>
+<div class="f"><h3>${t.near}</h3>${chips("near",t.nearO,true)}</div>
+<div class="f"><h3>${t.docs}</h3>${chips("doc",Object.fromEntries(t.docO.map((x,i)=>[String(i),x])))}<h3 style="margin-top:14px">${t.vxF}</h3>${chips("vxf",{any:t.hzO.any,noreq:t.noVx})}</div>
+<div class="f"><h3>${t.hrF}</h3>${chips("hrisk",t.hrO,true)}</div>
+<div class="f"><h3>${t.style}</h3>${chips("style",t.styleO,true)}</div>
+<div class="f"><h3>${t.flight}</h3><input type="range" id="flight" min="1" max="24" step="1" value="${S.flight}" aria-label="${t.flight}"><div class="row"><span>1 h</span><b id="flv">${S.flight>=24?t.anyH:t.hours(S.flight)}</b><span>24 h</span></div>
+ <h3 style="margin-top:14px">${t.budget}</h3>${chips("bud",{"1":t.budO[0],"2":t.budO[0]+" – "+t.budO[1],"3":t.budO[0]+" – "+t.budO[2]})}</div>
+<div class="f"><h3><label for="cont">${t.cont}</label></h3><select id="cont">${Object.entries(t.contO).map(([v,l])=>`<option value="${v}"${S.cont===v?" selected":""}>${esc(l)}</option>`).join("")}</select>
+ <h3 style="margin-top:14px"><label for="q">${t.search}</label></h3><input type="search" id="q" placeholder="${esc(t.searchPh)}" value="${esc(S.q)}"></div>`;
+$("flight").addEventListener("input",e=>{S.flight=+e.target.value;$("flv").textContent=S.flight>=24?T[L].anyH:T[L].hours(S.flight);update()});
+$("cont").addEventListener("change",e=>{S.cont=e.target.value;update()});
+$("q").addEventListener("input",e=>{S.q=e.target.value;update()});
+wrapCats($("filters"),"f");}
+
+function renderTrip(){const t=T[L];
+$("trip").innerHTML=`<div class="f"><h3><label for="orig">${t.origin}</label></h3><select id="orig">${ORIG.map(([c,n])=>`<option value="${c}"${S.orig===c?" selected":""}>${c==="other"?esc(t.otherO):esc(n+" ("+c+")")}</option>`).join("")}</select>${S.orig==="other"?`<input type="text" id="oiata" list="citylist" maxlength="60" autocomplete="off" placeholder="${esc(t.iataPh)}" value="${esc(S.oiata)}" style="margin-top:8px;width:100%;min-height:44px;font:16px Nunito,sans-serif;border:1.5px solid var(--line);border-radius:10px;padding:0 12px;background:var(--card);color:var(--ink);">`:""}</div>
+<div class="f"><h3><label for="days">${t.days}</label></h3><input type="number" id="days" min="1" max="90" value="${esc(S.days)}" inputmode="numeric"></div>
+<div class="f"><h3><label for="pax">${t.pax}</label></h3><input type="number" id="pax" min="1" max="12" value="${esc(S.pax)}" inputmode="numeric"></div>
+<div class="f"><h3><label for="maxB">${t.maxB}</label></h3><input type="number" id="maxB" min="0" step="100" placeholder="${esc(t.maxPh)}" value="${esc(S.maxB)}" inputmode="numeric"></div>`;
+$("trip").insertAdjacentHTML("beforeend",OPTK.map(k=>`<div class="f"><h3><label for="o-${k}">${esc(t.opt[k][0])}</label></h3><select id="o-${k}">${Object.entries(t.opt[k][1]).map(([v,l])=>`<option value="${v}"${S[k]===v?" selected":""}>${esc(l)}</option>`).join("")}</select></div>`).join(""));
+$("orig").addEventListener("change",e=>{S.orig=e.target.value;renderTrip();update()});if($("oiata"))$("oiata").addEventListener("change",e=>{S.oiata=e.target.value;update()});
+for(const k of OPTK)$("o-"+k).addEventListener("change",e=>{S[k]=e.target.value;update()});
+for(const k of ["days","pax","maxB"])$(k).addEventListener("input",e=>{S[k]=e.target.value;update()});
+wrapCats($("trip"),"t");}
+const OPENCAT=new Set();
+function catVal(f){const out=[];f.querySelectorAll(".chip[aria-pressed=true]").forEach(c=>out.push(c.textContent));
+ f.querySelectorAll("select").forEach(x=>{const o=x.options[x.selectedIndex];if(o)out.push(o.textContent)});
+ f.querySelectorAll("input[type=number],input[type=text],input[type=search]").forEach(x=>{if(x.value)out.push(x.value)});
+ const r=f.querySelector("input[type=range]");if(r){const v=f.querySelector("#flv");if(v)out.push(v.textContent)}
+ return out.join(" · ")}
+function wrapCats(root,pre){[...root.children].forEach((f,i)=>{if(!f.classList||!f.classList.contains("f"))return;const key=pre+i;
+ const title=[...f.querySelectorAll("h3")].map(h=>h.textContent.trim()).join(" · ");
+ const det=document.createElement("details");det.className="cat";if(OPENCAT.has(key))det.open=true;
+ det.addEventListener("toggle",()=>{det.open?OPENCAT.add(key):OPENCAT.delete(key)});
+ const sm=document.createElement("summary");const a=document.createElement("span");a.className="ct";a.textContent=title;const b=document.createElement("span");b.className="cv";b.textContent=catVal(f);
+ sm.append(a,b);root.insertBefore(det,f);det.append(sm,f)})}
+function refreshCatVals(){document.querySelectorAll("#fov details.cat").forEach(d=>{const f=d.querySelector(".f"),v=d.querySelector(".cv");if(f&&v)v.textContent=catVal(f)})}
+const FKEYS=["temp","rain","hz","doc","near","style","flight","bud","cont","q","vxf","secf","hrisk","carf"];
+function activeCount(){const d=DEF();return FKEYS.filter(k=>JSON.stringify(S[k])!==JSON.stringify(d[k])&&!(k==="q"&&!String(S.q).trim())).length}
+function updBar(n){const t=T[L],a=activeCount();$("fBtnT").textContent=t.fBtn;$("fBadge").textContent=a?String(a):"";$("fBadge").hidden=!a;
+ $("fSum").textContent=a?t.fAct(a):t.fNone;$("reset").hidden=!a;if(typeof n==="number")$("fDone").textContent=t.fDone(n);refreshCatVals()}
+const OVS=["fov","sov"];
+function openOv(id){$(id).hidden=false;document.body.style.overflow="hidden";const x=$(id).querySelector(".x");if(x)x.focus()}
+function closeOv(id){$(id).hidden=true;if($("ov").hidden&&OVS.every(o=>$(o).hidden))document.body.style.overflow=""}
+function renderStatic(){const t=T[L];document.documentElement.lang=L;
+$("t-title").innerHTML=`Destinauta<small>${esc(t.title.split(": ")[1])}</small>`;$("t-sub").textContent=t.sub;$("reset").textContent=t.reset;$("reset2").textContent=t.reset;$("fTitle").textContent=t.fTitle;$("gTrip").textContent=t.gTrip;$("gFilt").textContent=t.gFilt;$("fHint").textContent=t.fHint;$("sugBtnT").textContent=t.sugBtn;$("t-sort").textContent=t.sort;$("t-alerts").textContent=t.alerts;
+$("l-es").setAttribute("aria-pressed",L==="es");$("l-en").setAttribute("aria-pressed",L==="en");
+$("sort").innerHTML=Object.entries(t.sortO).map(([v,l])=>`<option value="${v}"${S.sort===v?" selected":""}>${esc(l)}</option>`).join("");
+$("foot").innerHTML=`<p>${esc(t.foot)}</p><p><a href="https://www.exteriores.gob.es/es/ServiciosAlCiudadano/Paginas/Recomendaciones-de-viaje.aspx" target="_blank" rel="noopener">${esc(t.exteriores)}</a> · <a href="https://destinauta.github.io/privacidad.html" target="_blank" rel="noopener">${esc(t.priv)}</a></p>`;
+renderFilters();renderTrip();
+renderSug();renderInbox();
+if(D){$("edition").textContent=t.edition(D.edition[L],fmtDate(D.reviewed),fmtDate(D.nextReview));renderAlerts()}}
+
+function renderMonths(){const t=T[L];
+$("months").innerHTML=t.months.map((n,i)=>`<button class="mo" data-m="${i}" aria-pressed="${S.m===i}" style="background:${SCOL[SEAS[i]]}"><span>${n}</span>${SICON[SEAS[i]]}<small>${t.seasons[SEAS[i]]}</small></button>`).join("");
+$("seasonline").innerHTML=t.seasonNote(esc(t.mfull[S.m]),esc(t.seasons[SEAS[S.m]]));}
+
+function renderAlerts(){const t=T[L],nm=id=>{const d=D.destinations.find(x=>x.id===id);return d?d.name[L]:id};
+const picks=(D.picks||[]).filter(id=>D.destinations.some(x=>x.id===id));
+$("alerts").innerHTML=D.alerts.map(a=>`<div class="alert"><time>${esc(fmtDate(a.date))}</time>${esc(a[L])}</div>`).join("")+
+(picks.length?`<div class="alert"><b>${esc(t.picks)}</b><br>${picks.map(p=>esc(nm(p))).join(" · ")}</div>`:"");}
+
+function pass(d){const m=S.m,t=d.hi[m];
+if(S.temp!=="any"&&tband(t)!==S.temp)return false;
+if(S.rain==="dry"&&d.rd[m]>5)return false;if(S.rain==="some"&&d.rd[m]>10)return false;
+const act=active(d,m);
+if(S.hz==="avoid"&&act.some(h=>!yearRound(h)&&h[3]>=2))return false;
+if(S.hz==="strict"&&act.some(h=>h[3]>=2))return false;
+if(d.d.l>+S.doc)return false;
+if(S.secf==="no4"&&d.sec.l>=4)return false;if(S.secf==="max2"&&d.sec.l>2)return false;if(S.secf==="only1"&&d.sec.l>1)return false;
+if(S.vxf==="noreq"&&d.vx.req.length)return false;
+if(S.hrisk.some(k=>k==="mal"?d.vx.mal>0:d.risk.includes(k)))return false;
+if(S.near.length&&!S.near.every(n=>d.near.includes(n)))return false;
+if(S.style.length&&!S.style.every(s=>d.t.includes(s)))return false;
+if(S.flight<24&&S.go!=="own"&&S.go!=="ground"&&fH(d)>S.flight)return false;
+if(S.carf==="noneed"&&d.car.l==="need")return false;if(S.carf==="nodrive"&&(d.car.l==="need"||d.car.l==="rec"))return false;
+if(d.b>+S.bud)return false;
+if(S.cont!=="all"&&d.c!==S.cont)return false;
+if(S.go==="own"&&!d.cost.km)return false;if(S.go==="ground"&&!d.cost.gr)return false;
+if(+S.maxB>0&&cost(d,m).lo>+S.maxB)return false;
+if(S.q.trim()){const q=S.q.trim().toLowerCase(),hay=[d.name.es,d.name.en,...d.see.es,...d.see.en,...d.eat.es,...d.eat.en,...d.t.map(x=>T.es.styleO[x]+" "+T.en.styleO[x])].join(" ").toLowerCase();if(!hay.includes(q))return false}
+return true}
+
+const PLANE='<svg viewBox="0 0 24 24"><path d="M2 13l8-2 5-8h2l-2 8 6-1 2-3h2l-1 5 1 5h-2l-2-3-6-1 2 8h-2l-5-8-8-2z" fill="#6d1a2a"/></svg>';
+const SICON={win:'<svg viewBox="0 0 32 32" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><path d="M16 3v26M5 9.5l22 13M5 22.5l22-13M12 5l4 3 4-3M12 27l4-3 4 3"/></svg>',
+spr:`<svg viewBox="0 0 32 32"><g fill="#fff">${[0,72,144,216,288].map(a=>`<ellipse cx="16" cy="8" rx="5" ry="7" transform="rotate(${a} 16 16)"/>`).join("")}</g><circle cx="16" cy="16" r="4.5" fill="#f2b705"/></svg>`,
+sum:`<svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="7" fill="#fff"/><g stroke="#fff" stroke-width="2.6" stroke-linecap="round">${[0,45,90,135,180,225,270,315].map(a=>`<path d="M16 2v4" transform="rotate(${a} 16 16)"/>`).join("")}</g></svg>`,
+aut:'<svg viewBox="0 0 32 32"><path d="M16 3c6 5 11 9 9 16-2 5-7 7-9 7s-7-2-9-7c-2-7 3-11 9-16z" fill="#fff"/><path d="M16 8v22" stroke="#bf5b27" stroke-width="2"/></svg>'};
+function hero(){const cl=(x,y,s)=>`<g transform="translate(${x} ${y}) scale(${s})" fill="#fff" opacity=".92"><ellipse cx="0" cy="0" rx="60" ry="22"/><ellipse cx="35" cy="-14" rx="38" ry="26"/><ellipse cx="-30" cy="-8" rx="30" ry="20"/></g>`;
+const bld=[[860,330,50,140],[915,290,40,180],[960,345,55,125],[1020,260,34,210],[1058,320,60,150],[1122,300,38,170]];
+$("heroart").innerHTML=`<defs><linearGradient id="hsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6cc4ee"/><stop offset=".7" stop-color="#c9ecfb"/><stop offset="1" stop-color="#fff4d6"/></linearGradient></defs>
+<rect width="1400" height="520" fill="url(#hsky)"/><circle cx="700" cy="350" r="56" fill="#ffd34d"/><circle cx="700" cy="350" r="78" fill="#ffd34d" opacity=".25"/>
+${cl(980,90,1)}${cl(300,60,.8)}${cl(640,150,.6)}
+<path d="M720 250 C 800 200, 880 230, 980 150" fill="none" stroke="#fff" stroke-width="4" stroke-dasharray="10 12" stroke-linecap="round"/>
+<g transform="translate(1000 140) rotate(-16) scale(2.4)"><path d="M2 13l8-2 5-8h2l-2 8 6-1 2-3h2l-1 5 1 5h-2l-2-3-6-1 2 8h-2l-5-8-8-2z" fill="#6d1a2a"/></g>
+<path d="M0 420 L180 300 L300 380 L430 260 L600 420Z" fill="#6f8fb3"/><path d="M380 300 L430 260 L475 300 L452 294 L430 306 L405 292Z" fill="#fff"/>
+<path d="M120 420 L260 340 L380 420Z" fill="#4e7297"/>
+${bld.map(([x,y,w,h])=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#35507a"/>${Array.from({length:Math.floor(h/26)},(_,r)=>Array.from({length:Math.floor(w/14)},(_,c)=>`<rect x="${x+6+c*14}" y="${y+10+r*26}" width="6" height="9" fill="#ffd77a" opacity="${(r+c)%3?0.9:0.35}"/>`).join("")).join("")}`).join("")}
+<path d="M0 430 Q 350 400 700 430 T 1400 425 V520 H0Z" fill="#2a9bb8"/>
+<path d="M0 455 q35 -10 70 0 t70 0 t70 0 t70 0 t70 0 t70 0 t70 0 t70 0 t70 0 t70 0 t70 0 t70 0 t70 0 t70 0 t70 0 t70 0 t70 0 t70 0 t70 0 t70 0" fill="none" stroke="#bdeaf5" stroke-width="3"/>
+<path d="M640 520 Q 760 440 1000 470 Q 1200 490 1400 470 V520Z" fill="#f2d39a"/>
+<g transform="translate(1190 480)"><path d="M0 0 C 6 -60 -4 -110 14 -150" stroke="#8a5a2b" stroke-width="12" fill="none" stroke-linecap="round"/>
+${[-60,-25,15,50,90].map(a=>`<path d="M14 -150 q 40 -10 70 25 q -40 -20 -70 -25" fill="#2f8f57" transform="rotate(${a} 14 -150)"/>`).join("")}</g>
+<g transform="translate(300 470)"><rect x="-40" y="-60" width="80" height="58" rx="10" fill="#6d1a2a"/><rect x="-16" y="-76" width="32" height="20" rx="6" fill="none" stroke="#6d1a2a" stroke-width="6"/><rect x="-40" y="-40" width="80" height="8" fill="#f2b705"/><circle cx="-26" cy="0" r="6" fill="#222"/><circle cx="26" cy="0" r="6" fill="#222"/></g>`}
+function scene(d,i){const k="g"+i+d.id,type=d.t.includes("aurora")?"aurora":["desert","islands","forest","mountain","lake","beach","city"].find(x=>d.near.includes(x))||"beach";const sky=(a,b)=>`<defs><linearGradient id="${k}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${a}"/><stop offset="1" stop-color="${b}"/></linearGradient></defs><rect width="340" height="150" fill="url(#${k})"/>`;
+const sun=(x,y,r,c)=>`<circle cx="${x}" cy="${y}" r="${r}" fill="${c||"#ffd34d"}"/>`;
+const palm=(x,y,s)=>`<g transform="translate(${x} ${y}) scale(${s})"><path d="M0 0 C 4 -25 -2 -45 8 -62" stroke="#8a5a2b" stroke-width="5" fill="none" stroke-linecap="round"/>${[-70,-30,10,50,90].map(a=>`<path d="M8 -62 q 18 -5 32 11 q -18 -9 -32 -11" fill="#2f8f57" transform="rotate(${a} 8 -62)"/>`).join("")}</g>`;
+const pine=(x,y,s,c)=>`<path d="M${x} ${y-30*s} L${x+11*s} ${y} L${x-11*s} ${y}Z" fill="${c||"#2f6b4f"}"/>`;
+const A={
+beach:sky("#79c6f0","#dff4ff")+sun(270,38,20)+`<path d="M0 88 H340 V150 H0Z" fill="#2a9bb8"/><path d="M0 100 q20 -6 40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0" stroke="#bdeaf5" stroke-width="2.5" fill="none"/><path d="M150 150 Q 230 108 340 116 V150Z" fill="#f2d39a"/>`+palm(292,128,1.1)+`<path d="M60 70 l10 -14 l10 14 z" fill="#fff"/><path d="M70 56 v16" stroke="#6d1a2a" stroke-width="2"/><path d="M52 72 h36 l-5 6 h-26z" fill="#6d1a2a"/>`,
+islands:sky("#6fc0ee","#d6f2ff")+sun(60,36,18)+`<path d="M0 82 H340 V150 H0Z" fill="#1f8fb0"/><ellipse cx="220" cy="100" rx="70" ry="16" fill="#f2d39a"/><ellipse cx="220" cy="96" rx="48" ry="12" fill="#57b36b"/><ellipse cx="80" cy="120" rx="40" ry="9" fill="#f2d39a"/>`+palm(232,96,.9)+palm(200,98,.7)+palm(84,118,.6)+`<path d="M0 132 q20 -5 40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0" stroke="#bdeaf5" stroke-width="2" fill="none"/>`,
+mountain:sky("#8fcdf2","#eaf7ff")+sun(66,40,16)+`<path d="M-10 150 L90 50 L170 150Z" fill="#7d9bc0"/><path d="M90 50 L112 72 L100 68 L90 76 L80 68 L70 72Z" fill="#fff"/><path d="M110 150 L220 34 L340 150Z" fill="#4f6f94"/><path d="M220 34 L248 64 L232 58 L220 68 L208 58 L193 64Z" fill="#fff"/><path d="M0 150 Q 170 110 340 140 V150Z" fill="#5aa06a"/>`+pine(40,146,1)+pine(62,148,.8)+pine(300,148,1.1)+pine(278,150,.8),
+lake:sky("#9fd6f4","#f0faff")+`<path d="M-10 100 L80 30 L160 100Z" fill="#6e8fb6"/><path d="M80 30 L98 46 L80 42 L62 46Z" fill="#fff"/><path d="M120 100 L230 20 L350 100Z" fill="#4f6f94"/><path d="M230 20 L252 38 L230 33 L208 38Z" fill="#fff"/><rect y="100" width="340" height="50" fill="#3aa3c4"/><path d="M-10 100 L80 150 L160 100Z" fill="#6e8fb6" opacity=".35"/><path d="M120 100 L230 160 L350 100Z" fill="#4f6f94" opacity=".35"/><path d="M40 122 h40 M200 132 h60 M120 140 h30" stroke="#d8f3fb" stroke-width="2.5" stroke-linecap="round"/>`,
+city:sky("#ffb27a","#ffe7c2")+sun(70,60,24,"#fff1b8")+[[20,60,34,90],[58,40,26,110],[88,72,40,78],[132,28,22,122],[158,64,46,86],[208,46,30,104],[242,78,40,72],[286,52,34,98]].map(([x,y,w,h])=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#3b4a6b"/>${Array.from({length:Math.floor(h/16)},(_,r)=>Array.from({length:Math.floor(w/10)},(_,c)=>`<rect x="${x+4+c*10}" y="${y+6+r*16}" width="4" height="6" fill="#ffd77a" opacity="${(r*3+c)%4?0.9:0.3}"/>`).join("")).join("")}`).join("")+`<rect x="141" y="12" width="4" height="18" fill="#3b4a6b"/>`,
+desert:sky("#ffcf8a","#fff2d6")+sun(250,46,26,"#ff9f43")+`<path d="M90 112 Q 170 70 250 112Z" fill="#e9b25f"/>`+palm(206,110,.55)+palm(226,112,.45)+`<ellipse cx="214" cy="112" rx="26" ry="4" fill="#3aa3c4"/><path d="M0 120 Q 90 90 180 118 T 340 108 V150 H0Z" fill="#eab36a"/><path d="M0 138 Q 120 112 230 138 T 340 132 V150 H0Z" fill="#d48a3c"/><g fill="#5a3b1d" transform="translate(60 112)"><ellipse cx="0" cy="0" rx="16" ry="7"/><circle cx="-3" cy="-7" r="6"/><path d="M13 -2 q6 -10 2 -18 l5 -2 q4 10 -3 21z"/><rect x="-12" y="4" width="3" height="12"/><rect x="8" y="4" width="3" height="12"/></g>`,
+forest:sky("#9fdcc0","#e8f8ef")+sun(280,36,16)+`<path d="M0 90 Q 80 50 170 86 T 340 76 V150 H0Z" fill="#5aa06a"/><path d="M0 116 Q 100 84 200 112 T 340 104 V150 H0Z" fill="#2f7d4f"/>`+[20,60,100,240,290,320].map((x,j)=>pine(x,112+(j%2)*8,1.2,"#1f5e3b")).join("")+`<path d="M150 150 q-30 -60 10 -86 q-10 40 20 86z" fill="#3e9c5a"/><path d="M190 150 q40 -50 0 -80 q20 40 -18 80z" fill="#47b066"/><g transform="translate(232 70)"><ellipse cx="0" cy="0" rx="9" ry="12" fill="#222"/><path d="M4 -8 q16 0 18 6 q-10 2 -18 -2z" fill="#ff9f1c"/><circle cx="2" cy="-6" r="2" fill="#fff"/></g>`,
+aurora:sky("#0b1f3a","#1e4466")+Array.from({length:22},(_,j)=>`<circle cx="${(j*53)%340}" cy="${(j*29)%70+6}" r="${j%3?1:1.6}" fill="#fff" opacity=".85"/>`).join("")+`<path d="M-10 70 C 60 20, 120 80, 190 30 S 300 50, 350 20" stroke="#5dffb0" stroke-width="22" fill="none" opacity=".45" stroke-linecap="round"/><path d="M-10 84 C 70 40, 140 90, 210 48 S 310 66, 350 40" stroke="#9cfff0" stroke-width="10" fill="none" opacity=".4" stroke-linecap="round"/><path d="M0 120 Q 120 96 220 116 T 340 110 V150 H0Z" fill="#e9f3fb"/>`+[30,52,76,250,280,306].map((x,j)=>pine(x,124+(j%2)*6,1.1,"#123a2c")).join("")+`<rect x="150" y="104" width="34" height="22" fill="#6d1a2a"/><path d="M146 106 L167 90 L188 106Z" fill="#fff"/><rect x="162" y="112" width="8" height="8" fill="#ffd77a"/>`};
+return `<svg viewBox="0 0 340 150" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${A[type]||A.beach}</svg>`}
+function tcol(t){return t<5?"#3d7ea6":t<12?"#5aa0b8":t<18?"#7bb37c":t<25?"#e0b23a":t<31?"#e08a2a":"#c4452b"}
+function card(d,_i,full){const t=T[L],m=S.m,act=active(d,m),seasonal=act.filter(h=>!yearRound(h)),yr=act.filter(yearRound);
+const hzP=[...seasonal.map(h=>`<span class="pill p${h[3]}">${esc(HZ[L][h[0]])}</span>`),...yr.map(h=>`<span class="pill p${h[3]}">${esc(HZ[L][h[0]])} · ${t.year}</span>`)].join("")||`<span class="pill">${t.noHz}</span>`;
+const nearP=d.near.map(n=>`<span class="pill">${esc(t.nearO[n]||n)}</span>`).join("");
+const maxT=Math.max(...d.hi,30),minT=Math.min(...d.hi,0),rng=maxT-minT||1;
+const tempBars=d.hi.map(v=>`<div class="tb" title="${v}°"><i style="height:${Math.max(6,(v-minT)/rng*100)}%;background:${tcol(v)}"></i></div>`).join("");
+const rainCells=d.rd.map(v=>`<div class="cell" title="${v}" style="background:color-mix(in srgb,var(--teal) ${Math.min(100,v*4.5)}%,var(--soft))"></div>`).join("");
+const riskCells=t.months.map((_,i)=>{const s=Math.max(0,...d.hz.filter(h=>!yearRound(h)&&inM(h,i)).map(h=>h[3]));return `<div class="cell ${s?"p"+s:""}"></div>`}).join("");
+const mrow=t.months.map((n,i)=>`<div class="m${i===m?" on":""}">${n.slice(0,1)}</div>`).join("");
+const k=cost(d,m);
+const tzs=d.tz===0?"0 h":(d.tz>0?"+":"")+String(d.tz).replace(".5",":30")+" h";
+return `<article class="card${full?" full":""}"><div class="post" data-open="${esc(d.id)}">${scene(d,_i)}${isIdeal(d,m)?`<span class="ideal">${t.ideal}</span>`:""}<span class="stamp">${S.go==="own"&&d.cost.km?CARSVG.replace('fill="currentColor"','fill="#6d1a2a"')+Math.max(1,Math.round(d.cost.km/85)):PLANE+fH(d)} h</span>${d.sec.l>=3?`<span class="warnflag w${d.sec.l}">${esc(t.secO[d.sec.l])}</span>`:""}</div><div class="body">
+<h4>${esc(d.name[L])}</h4>
+<div class="stats"><div><b>${d.hi[m]}°</b><span>${t.hi}</span></div><div><b>${d.rd[m]}</b><span>${t.rd}</span></div>${S.go==="own"&&d.cost.km?`<div><b>${Math.max(1,Math.round(d.cost.km/85))} h</b><span>${t.drv}</span></div>`:`<div><b>${fH(d)} h</b><span>${t.fl}</span></div>`}<div><b>${"€".repeat(d.b)}</b><span>${t.bud}</span></div></div>
+<div class="pills">${hzP}</div>
+<div class="cost"><small>${esc(t.costT(k.days,k.pax))}</small><b>${eur(k.lo)} – ${eur(k.hi)}</b><small>≈ ${eur(k.tot/k.pax)} ${t.perP}</small></div>
+<div class="sec s${d.sec.l}"><b>${esc(t.sec)}: ${esc(t.secO[d.sec.l])}</b>${esc(d.sec[L])}</div>
+<div class="doc"><b>${esc(t.docO[d.d.l])}.</b> ${esc(d.d[L])}</div>
+<div class="doc" style="border-color:var(--brand2)"><b style="color:var(--brand2)">${t.vx}.</b> ${t.vxReq}: ${d.vx.req.length?esc(d.vx.req.map(v=>VX[L][v]).join(", ")):t.vxNone}. ${t.vxRec}: ${d.vx.rec.length?esc(d.vx.rec.map(v=>VX[L][v]).join(", ")):t.vxRoutine}. ${esc(t.mal[d.vx.mal])}.<br><b style="color:var(--brand2)">${t.hrT}:</b> ${d.risk.length?esc(d.risk.map(k=>t.hrO[k]).join(", ")):t.hrNone}.${d.risk.includes("zika")?" "+esc(t.zikaN):""}</div>
+<div class="pills">${nearP}<span class="pill car-${d.car.l}">${CARSVG}${esc(t.carO[d.car.l])}</span></div>
+<ul class="see">${d.see[L].map(s=>`<li>${esc(s)}</li>`).join("")}</ul>${full?`<div class="eat"><b>${esc(t.eat)}</b>${d.eat[L].map(x=>`<span>${esc(x)}</span>`).join("")}</div>`:""}
+<details${full?" open":""}><summary>${t.more}</summary>
+<div class="cal"><span></span>${mrow}<span class="l">${t.tempRow}</span>${tempBars}<span class="l">${t.rainRow}</span>${rainCells}<span class="l">${t.riskRow}</span>${riskCells}</div>
+<div class="pills">${d.hz.map(h=>`<span class="pill p${h[3]}">${esc(HZ[L][h[0]])}: ${yearRound(h)?t.year:esc(t.months[h[1]-1]+"–"+t.months[h[2]-1])}</span>`).join("")}</div>
+<p class="meta">${k.parts.filter(x=>x[1]>0).map(([n,v])=>`<b>${esc(n==="go"?t.trip:n==="entry"?t.entry:t.opt[n][0])}:</b> ${eur(v)}`).join(" · ")}${k.gNA?"<br>"+esc(t.groundNA):""}${k.oNA?"<br>"+esc(t.ownNA):""}${k.own?"<br>"+esc(t.ownNote(k.own.km,k.own.h,k.own.f))+(S.move==="car"?" "+esc(t.ownRent):""):""}${S.food==="menu"?"<br>"+esc(t.menuNote):""}<br>${esc(t.costNote)}</p>
+<p class="meta"><b>${t.health}:</b> ${esc(d.h[L])}${d.vx.yfc?" "+esc(t.yfc)+".":""} ${esc(t.vxNote)}</p>
+<p class="meta"><b>${t.lang}:</b> ${esc(d.lang)} · <b>${t.cur}:</b> ${esc(d.cur)} · <b>${t.tz}:</b> ${tzs}</p>
+<p class="meta"><a href="https://www.exteriores.gob.es/es/ServiciosAlCiudadano/Paginas/Recomendaciones-de-viaje.aspx" target="_blank" rel="noopener">${t.exteriores}</a></p>
+</details>${full?"":`<button class="open" data-open="${esc(d.id)}">${esc(t.openD)} →</button>`}</div></article>`}
+
+const MAILTO=["destinauta","sugerencias"].join(".")+"@"+["gmail","com"].join(".");
+let SG={topic:"idea",name:"",msg:"",stat:"",ok:true};
+function initSug(){renderSug()}
+function renderInbox(){const b=$("inbox");if(b)b.innerHTML=""}
+function sugText(){const t=T[L];return `${t.sugTopicL}: ${t.sugTopics[SG.topic]}\n${t.sugNameL}: ${SG.name.trim()||"-"}\n\n${SG.msg.trim()}`}
+async function copyTxt(txt){const t=T[L];try{await navigator.clipboard.writeText(txt);SG.stat=t.sugCopied;SG.ok=true}catch(e){SG.stat=t.sugCopyFail;SG.ok=false}const st=$("sgstat");if(st){st.textContent=SG.stat;st.className="sugstat "+(SG.ok?"ok":"bad")}}
+function renderSug(){const t=T[L];$("sugTitle").textContent=t.sugT;const b=$("sugbody");
+ b.innerHTML=`<p class="sub" style="opacity:1">${esc(t.sugIntro)}</p>
+ <div class="sugform">
+ <div class="fromrow" style="margin:0"><b>${esc(t.sugTo)}:</b><span id="sgaddr" style="font-weight:700;overflow-wrap:anywhere"></span><button type="button" class="delbtn" id="sgca" style="border-color:var(--teal);color:var(--teal)">${esc(t.sugCopyA)}</button></div>
+ <div><label for="sgt">${esc(t.sugTopic)}</label><select id="sgt">${Object.entries(t.sugTopics).map(([v,l])=>`<option value="${v}"${SG.topic===v?" selected":""}>${esc(l)}</option>`).join("")}</select></div>
+ <div><label for="sgn">${esc(t.sugName)}</label><input id="sgn" maxlength="80" autocomplete="name" value="${esc(SG.name)}"></div>
+ <div><label for="sgm">${esc(t.sugMsg)}</label><textarea id="sgm" maxlength="1500">${esc(SG.msg)}</textarea></div>
+ <div style="display:flex;flex-wrap:wrap;gap:10px"><a class="open" id="sgo" target="_blank" rel="noopener" style="text-decoration:none;display:inline-flex;align-items:center" href="#">${esc(t.sugOpen)}</a><button type="button" class="reset" id="sgcm">${esc(t.sugCopyM)}</button></div>
+ <div class="sugstat ${SG.ok?"ok":"bad"}" id="sgstat" role="status">${esc(SG.stat)}</div>
+ <p class="meta">${esc(t.sugHow)}</p></div>`;
+ $("sgaddr").textContent=MAILTO;
+ const upd=()=>{$("sgo").href="mailto:"+MAILTO+"?subject="+encodeURIComponent(t.sugSubj+" · "+t.sugTopics[SG.topic])+"&body="+encodeURIComponent(sugText())};upd();
+ $("sgt").addEventListener("change",e=>{SG.topic=e.target.value;upd()});$("sgn").addEventListener("input",e=>{SG.name=e.target.value;upd()});$("sgm").addEventListener("input",e=>{SG.msg=e.target.value;upd()});
+ $("sgca").addEventListener("click",()=>copyTxt(MAILTO));$("sgcm").addEventListener("click",()=>copyTxt(sugText()))}
+const CARSVG='<svg viewBox="0 0 24 24" width="16" height="16" style="vertical-align:-3px;margin-right:4px"><path d="M4 15l2-6h12l2 6v4h-2v-2H6v2H4z" fill="currentColor"/><circle cx="7.5" cy="15" r="1.5" fill="#fff"/><circle cx="16.5" cy="15" r="1.5" fill="#fff"/></svg>';
+function nextYM(m){const n=new Date();let y=n.getFullYear();if(m<n.getMonth())y++;return String(y).slice(2)+String(m+1).padStart(2,"0")}
+function links(d){const t=T[L],o=oCode(),on=oName(),q=encodeURIComponent(d.go.q),ap=d.go.ap,pax=Math.max(1,Math.round(+S.pax)||2);
+ const en=T.en.mfull[S.m];
+ return [...(o?[["sky",`https://www.skyscanner.es/transporte/vuelos/${o.toLowerCase()}/${ap.toLowerCase()}/?oym=${nextYM(S.m)}&adultsv2=${pax}`]]:[]),
+ ["gf",`https://www.google.com/travel/flights?q=${encodeURIComponent(`Flights from ${o||on} to ${ap} in ${en}`)}&hl=${L}`],
+ ["hotel",`https://www.booking.com/searchresults.html?ss=${q}&group_adults=${pax}&lang=${L==="es"?"es":"en-gb"}`],
+ ["act",`https://www.getyourguide.com/s/?q=${q}`],
+ ["rent","https://www.rentalcars.com/"],
+ ["r2r",`https://www.rome2rio.com/map/${q}`],
+ ["map",`https://www.google.com/maps/search/?api=1&query=${q}`],
+ ...(d.cost.km?[["dircar",`https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(on)}&destination=${q}&travelmode=driving`]]:[]),
+ ["dirap",`https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(ap+" airport")}&destination=${q}&travelmode=transit`]]}
+const CO=[[/\bTIB\b/,"https://www.tib.org","TIB"],[/EMT/,"https://www.emtpalma.cat","EMT Palma"],[/Tren de Sóller|Sóller train/,"https://trendesoller.com","Tren de Sóller"],[/Baleària/,"https://www.balearia.com","Baleària"],[/Trasmed/,"https://www.trasmed.com","Trasmed"],
+[/Porto Santo Line/,"https://www.portosantoline.pt","Porto Santo Line"],[/Horários do Funchal/,"https://www.horariosdofunchal.pt","Horários do Funchal"],[/SATA|Azores Airlines/,"https://www.azoresairlines.pt","SATA / Azores Airlines"],[/Atlânticoline/,"https://www.atlanticoline.pt","Atlânticoline"],
+[/Minoan/,"https://www.minoan.gr","Minoan Lines"],[/ANEK/,"https://www.anek.gr","ANEK"],[/Blue Star/,"https://www.bluestarferries.com","Blue Star Ferries"],[/Trinacria Express|Trenitalia regional|Trenes regionales de Trenitalia/,"https://www.trenitalia.com","Trenitalia"],[/Caronte/,"https://carontetourist.it","Caronte & Tourist"],[/Grimaldi/,"https://www.grimaldi-lines.com","Grimaldi Lines"],[/ARST/,"https://www.arst.sardegna.it","ARST"],
+[/Malta Public Transport/,"https://www.publictransport.com.mt","Malta Public Transport"],[/Gozo Channel/,"https://www.gozochannel.com","Gozo Channel"],[/Virtu Ferries|Ferry rápido La Valeta|Fast ferry Valletta/,"https://www.virtuferries.com","Virtu Ferries"],[/Cyprus by Bus/,"https://www.cyprusbybus.com","Cyprus by Bus"],
+[/TheBus/,"https://www.thebus.org","TheBus"],[/Hawaiian Airlines/,"https://www.hawaiianairlines.com","Hawaiian Airlines"],[/Haleakalā \(reserva|Haleakalā sunrise \(reservation/,"https://www.nps.gov/hale/","Haleakalā (NPS)"],[/Cat Cocos/,"https://www.catcocos.com","Cat Cocos"],[/Air Seychelles/,"https://www.airseychelles.com","Air Seychelles"],[/Air Tahiti/,"https://www.airtahiti.com","Air Tahiti"],
+[/Sanur|Padang Bai|Bangsal|Lembongan/,"https://12go.asia","12Go"],
+[/TITSA/,"https://titsa.com","TITSA"],[/Tranv[ií]a de Tenerife|Tenerife tram/,"https://metrotenerife.com","Metrotenerife"],[/Fred\. Olsen/,"https://www.fredolsen.es","Fred. Olsen"],[/Naviera Armas/,"https://www.navieraarmas.com","Naviera Armas"],[/Binter/,"https://www.bintercanarias.com","Binter"],[/teleférico del Teide|Teide cable car/,"https://www.volcanoteide.com","Teleférico del Teide"],[/Guaguas Municipales/,"https://www.guaguas.com","Guaguas Municipales"],[/Arrecife Bus/,"https://www.arrecifebus.com","Arrecife Bus"],[/Tiadhe/,"https://www.tiadhe.com","Tiadhe"],
+[/Metro línea roja al centro, ~25|red line to the centre, ~25|Metro de 4 líneas|4-line metro/,"https://www.metrolisboa.pt","Metro Lisboa"],[/Tranvía 28|Tram 28/,"https://www.carris.pt","Carris"],[/Tren a Sintra|Train to Sintra|Tren a Cascais|Train to Cascais|Algarve en tren|Algarve by train/,"https://www.cp.pt","CP"],[/Rede Expressos|Lisboa–Algarve|Lisbon–Algarve/,"https://rede-expressos.pt","Rede Expressos"],[/FlixBus/,"https://www.flixbus.es","FlixBus"],
+[/Ferryhopper|Cícladas|Cyclades/,"https://www.ferryhopper.com","Ferryhopper"],[/Leonardo Express|Trenitalia|Alta velocidad a Florencia|High-speed train to Florence|Cinque Terre/,"https://www.trenitalia.com","Trenitalia"],[/Italo/,"https://www.italotreno.com","Italo"],[/Jadrolinija|Catamaranes entre Dubrovnik|Catamarans between Dubrovnik/,"https://www.jadrolinija.hr","Jadrolinija"],[/Libertas/,"https://www.libertasdubrovnik.hr","Libertas"],
+[/Flybus/,"https://www.re.is","Reykjavik Excursions"],[/Airport Direct/,"https://airportdirect.is","Airport Direct"],[/Strætó/,"https://straeto.is","Strætó"],[/road\.is/,"https://www.road.is","road.is"],[/safetravel\.is/,"https://safetravel.is","safetravel.is"],[/\(VR\)/,"https://www.vr.fi","VR"],
+[/Swiss Travel Pass|Estación de tren dentro|Train station inside|Tren a Zermatt|Train to Zermatt/,"https://www.sbb.ch","SBB"],[/Glacier Express/,"https://www.glacierexpress.ch","Glacier Express"],
+[/Heathrow Express/,"https://www.heathrowexpress.com","Heathrow Express"],[/Elizabeth line|Piccadilly|contactless \(tope|contactless card \(daily/,"https://tfl.gov.uk","TfL"],[/Gatwick/,"https://www.gatwickexpress.com","Gatwick Express"],[/Stansted/,"https://www.stanstedexpress.com","Stansted Express"],[/National Express/,"https://www.nationalexpress.com","National Express"],[/Megabus/,"https://uk.megabus.com","Megabus"],[/Santander Cycles/,"https://tfl.gov.uk/modes/cycling/santander-cycles","Santander Cycles"],
+[/ONCF/,"https://www.oncf.ma","ONCF"],[/CTM/,"https://www.ctm.ma","CTM"],[/Supratours/,"https://www.supratours.ma","Supratours"],
+[/Havaist/,"https://www.havaist.com.tr","Havaist"],[/Istanbulkart|Metro M11|M11 metro/,"https://www.metro.istanbul","Metro İstanbul"],
+[/Narita Express/,"https://www.jreast.co.jp/multi/en/nex/","Narita Express"],[/Skyliner/,"https://www.keisei.co.jp/keisei/tetudou/skyliner/us/","Skyliner"],[/Limousine Bus/,"https://www.limousinebus.co.jp/en/","Limousine Bus"],[/Shinkansen/,"https://smart-ex.jp/en/","SmartEX (Shinkansen)"],
+[/AREX/,"https://www.arex.or.kr","AREX"],[/KTX/,"https://www.letskorail.com","Korail"],[/Alta velocidad Pekín|High-speed train Beijing/,"https://www.12306.cn/en/index.html","China Railway 12306"],
+[/BTS Skytrain/,"https://www.bts.co.th","BTS"],[/Tren nocturno Bangkok|Night train Bangkok|Tren de la Reunificación|Reunification Express|Ferries entre islas \(Phi|Ferries between islands \(Phi|Furgoneta Puerto Princesa|Van Puerto Princesa|Ferry El Nido|Lancha rápida a Nusa|Fast boat to Nusa|Bus por la costa sur a Galle|Bus along the south coast to Galle|Ha Long|Sapa/,"https://12go.asia","12Go"],
+[/Phi Phi|Koh Lanta|Cebú–Tagbilaran|Cebu–Tagbilaran|El Nido–Coron|Coron–El Nido|Puerto Princesa–El Nido/,"https://12go.asia","12Go"],[/Vuelos internos Hanói|Flights Hanoi/,"https://www.vietnamairlines.com","Vietnam Airlines"],[/Kandy–Ella|Kandy-Ella/,"https://seatreservation.railway.gov.lk","Sri Lanka Railways"],
+[/Airport Express Line/,"https://www.delhimetrorail.com","Delhi Metro"],[/Tren rápido Delhi|Fast train Delhi|Jaipur/,"https://www.irctc.co.in","IRCTC"],
+[/Nol/,"https://www.rta.ae","RTA Dubai"],[/JETT/,"https://www.jett.com.jo","JETT"],[/Dar es Salaam/,"https://www.azammarine.com","Azam Marine"],[/Koh Phangan/,"https://www.lomprayah.com","Lomprayah"],[/MyCiTi/,"https://www.myciti.org.za","MyCiTi"],
+[/OMNY|AirTrain/,"https://new.mta.info","MTA"],[/Amtrak/,"https://www.amtrak.com","Amtrak"],[/ADO/,"https://www.ado.com.mx","ADO"],[/Tren Maya/,"https://www.trenmaya.gob.mx","Tren Maya"],[/Cozumel/,"https://www.ultramarferry.com","Ultramar"],
+[/domésticos a Tortuguero|Domestic flights to Tortuguero/,"https://www.flysansa.com","Sansa"],[/Aguas Calientes/,"https://www.perurail.com","PeruRail"],[/Aguas Calientes/,"https://www.incarail.com","Inca Rail"],[/Machu Picchu \(entradas|Machu Picchu \(book/,"https://www.machupicchu.gob.pe","Machu Picchu (entradas oficiales)"],
+[/Colonia/,"https://www.buquebus.com","Buquebus"],[/El Calafate, Iguazú/,"https://www.aerolineas.com.ar","Aerolíneas Argentinas"],[/SUBE/,"https://www.argentina.gob.ar/sube","SUBE"],
+[/Opal/,"https://transportnsw.info","Transport NSW"],[/AT HOP/,"https://at.govt.nz","Auckland Transport"],[/InterCity/,"https://www.intercity.co.nz","InterCity"],[/TranzAlpine/,"https://www.greatjourneysnz.com","TranzAlpine"]];
+const APPS={"uber":"https://www.uber.com","bolt":"https://bolt.eu","freenow":"https://www.free-now.com","cabify":"https://cabify.com","careem":"https://www.careem.com","grab":"https://www.grab.com","gojek":"https://www.gojek.com","didi":"https://web.didiglobal.com","indrive":"https://indrive.com","lyft":"https://www.lyft.com","ola":"https://www.olacabs.com","pickme":"https://pickme.lk","kakao t":"https://www.kakaomobility.com","go":"https://go.goinc.jp","bitaksi":"https://www.bitaksi.com","xanh sm":"https://www.xanhsm.com","be":"https://be.com.vn","rapido":"https://www.rapido.bike","ittaxi":"https://www.ittaxi.it","citymapper":"https://citymapper.com","app sbb":"https://www.sbb.ch","sbb app":"https://www.sbb.ch","hreyfill":"https://www.hreyfill.is","ecabs":"https://www.ecabs.com.mt"};
+function itemLinks(d,txt,grp,m){const t=T[L],seen=new Set(),out=[];for(const [re,u,n] of CO){if(re.test(txt)&&!seen.has(u)){seen.add(u);out.push(`<a class="tlink" href="${esc(u)}" target="_blank" rel="noopener">${esc(n)} ↗</a>`)}}
+ if(!out.length){const q=d.go.q+" "+(grp==="air"?"airport ":"")+(T.en.modes[m]||m);out.push(`<a class="tlink srch" href="https://www.google.com/search?q=${encodeURIComponent(q)}" target="_blank" rel="noopener">${esc(t.srch)} ↗</a>`)}
+ return out.join("")}
+function appLinks(d){const txt=d.go.apps[L];return esc(txt).replace(/[A-Za-zÀ-ÿ][A-Za-zÀ-ÿ .]*?(?=,|\(|$)/g,w=>{const k=w.trim().toLowerCase().replace(/\s+\(.*$/,"");const u=APPS[k];return u?`<a class="tlink" href="${u}" target="_blank" rel="noopener">${w.trim()} ↗</a>${w.endsWith(" ")?" ":""}`:w})}
+function detail(d){const t=T[L],k=d.car.l;
+ const grp=(title,list,g)=>`<p class="gh">${esc(title)}</p><ul class="tlist">${list.map(([m,es,en])=>`<li><span class="mode m-${esc(m)}">${esc(t.modes[m]||m)}</span><span>${esc(L==="es"?es:en)}<span class="tlinks">${itemLinks(d,es+" "+en,g,m)}</span></span></li>`).join("")}</ul>`;
+ const lk=links(d).map(([key,u])=>`<a class="bkbtn${(key==="rent"&&(k==="need"||k==="rec")&&S.go!=="own")||(key==="dircar"&&S.go==="own")?" hl":""}" href="${esc(u)}" target="_blank" rel="noopener">${esc(t.bk[key])} ↗</a>`).join("");
+ const off=[...d.go.off.map(([n,u])=>[n,u]),[t.exteriores2,"https://www.exteriores.gob.es/es/ServiciosAlCiudadano/Paginas/Recomendaciones-de-viaje.aspx"],[t.registro,"https://registroviajeros.exteriores.gob.es/"]];
+ const oc=oCode();const on=(S.orig==="other"&&!(oc&&SPAIN.has(oc)))?t.otherNote:(oc&&oc!=="MAD"?t.origNote(oName()):"");
+ return `<button class="x" id="closeD" aria-label="${esc(t.close)}">✕</button>
+ ${card(d,0,true).replace(/<\/h4>/,`</h4><div class="carbox car-${k}">${CARSVG}<b>${esc(t.car)} ${esc(t.carO[k])}.</b> ${esc(d.car[L])}</div>
+ <section><h3 class="sh">${esc(t.book)}</h3>
+ <div class="fromrow"><label for="dfrom">${esc(t.bookFrom)}</label><input id="dfrom" list="citylist" maxlength="60" autocomplete="off" placeholder="${esc(t.bookFromPh)}" value="${esc(oName())}"><span class="code">${esc(oCode()||"?")}</span></div>
+ ${oCode()?"":`<p class="meta" style="color:#c4452b">${esc(t.skyNeed)}</p>`}<div class="bkgrid">${lk}</div><p class="meta">${esc(t.bookNote)}${on?" "+esc(on):""}${(S.go==="ground"||S.go==="own")&&S.orig!=="MAD"?" "+esc(t.groundNote):""}</p>
+ <p class="gh">${esc(t.official)}</p><ul class="offl">${off.map(([n,u])=>`<li><a href="${esc(u)}" target="_blank" rel="noopener">${esc(n)} ↗</a></li>`).join("")}</ul></section>
+ <section><h3 class="sh">${esc(t.move)}</h3><p class="meta"><b>${esc(t.apLabel)}:</b> ${esc(d.go.ap)}</p>${d.go.rt?`<p class="gh">${esc(t.byCar)}</p><ul class="tlist"><li><span class="mode m-car">${esc(t.modes.car)}</span><span>${esc(d.go.rt[L])}${d.cost.km?" "+esc(t.ownNote(d.cost.km,Math.max(1,Math.round(d.cost.km/85)),!!d.cost.ferry)):""}</span></li></ul>`:""}${grp(t.fromAp,d.go.air,"air")}${grp(t.inCity,d.go.city,"city")}${grp(t.nearby,d.go.near,"near")}<p class="meta"><b>${esc(t.apps)}:</b> ${appLinks(d)}</p>
+ <p class="gh">${esc(t.exT)}</p><div class="tlinks big"><a class="tlink" href="https://www.getyourguide.com/s/?q=${encodeURIComponent(d.go.q)}" target="_blank" rel="noopener">GetYourGuide ↗</a><a class="tlink" href="https://www.viator.com/searchResults/all?text=${encodeURIComponent(d.go.q)}" target="_blank" rel="noopener">Viator ↗</a><a class="tlink" href="https://www.google.com/search?q=${encodeURIComponent("Civitatis "+d.go.q)}" target="_blank" rel="noopener">Civitatis ↗</a><a class="tlink" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent("taxi "+d.go.q)}" target="_blank" rel="noopener">${esc(t.taxiMap)} ↗</a></div></section>
+ <h3 class="sh">${esc(t.info)}</h3>`)}`}
+function showDetail(){if(!D)return;const id=location.hash.slice(1),d=D.destinations.find(x=>x.id===id),ov=$("ov");
+ if(!d){if(!ov.hidden){ov.hidden=true;document.body.style.overflow=""}return}
+ $("sheet").innerHTML=detail(d);ov.hidden=false;document.body.style.overflow="hidden";$("sheet").scrollTop=0;
+ $("closeD").addEventListener("click",closeDetail);$("closeD").focus();
+ const df=$("dfrom");if(df){df.addEventListener("change",e=>{setOrigin(e.target.value);renderTrip();update()});df.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();df.blur()}})}}
+function closeDetail(){try{history.replaceState(null,"",location.pathname+location.search)}catch(e){location.hash=""}showDetail()}
+window.addEventListener("hashchange",showDetail);
+document.addEventListener("keydown",e=>{if(e.key!=="Escape")return;if(!$("ov").hidden){closeDetail();return}for(const o of OVS)if(!$(o).hidden){closeOv(o);return}});
+function update(){store.set("rumbo-f",S);if(!D)return;const m=S.m;
+let r=D.destinations.filter(pass);
+const sorts={total:(a,b)=>cost(a,m).tot-cost(b,m).tot,best:(a,b)=>score(b,m)-score(a,m),flight:(a,b)=>fH(a)-fH(b),warm:(a,b)=>b.hi[m]-a.hi[m],cheap:(a,b)=>a.b-b.b||score(b,m)-score(a,m)};
+r.sort(sorts[S.sort]||sorts.best);
+$("count").textContent=T[L].count(r.length);updBar(r.length);
+$("results").innerHTML=r.length?r.map((d,i)=>card(d,i)).join(""):`<div class="empty">${esc(T[L].empty)}</div>`;
+if(!$("ov").hidden)showDetail();}
+
+document.addEventListener("click",e=>{const op=e.target.closest("[data-open]");if(op&&!op.closest(".full")){location.hash=op.dataset.open;return}
+if(e.target.id==="ov"){closeDetail();return}
+if(e.target.id==="fov"||e.target.id==="sov"){closeOv(e.target.id);return}
+const b=e.target.closest("button");if(!b)return;
+if(b.classList.contains("mo")){S.m=+b.dataset.m;renderMonths();update();return}
+if(b.classList.contains("chip")){const k=b.dataset.k,v=b.dataset.v;
+ if(b.dataset.multi==="1"){S[k]=S[k].includes(v)?S[k].filter(x=>x!==v):[...S[k],v]}else{S[k]=k==="doc"||k==="bud"?+v:v}
+ renderFilters();update();return}
+if(b.id==="l-es"||b.id==="l-en"){L=b.id==="l-es"?"es":"en";store.set("rumbo-l",L);renderStatic();renderMonths();update();return}
+if(b.id==="reset"||b.id==="reset2"){S=DEF();renderStatic();renderMonths();update();return}
+if(b.id==="fBtn"){openOv("fov");return}if(b.id==="fClose"||b.id==="fDone"){closeOv("fov");return}
+if(b.id==="sugBtn"){openOv("sov");return}if(b.id==="sClose"){closeOv("sov");return}});
+$("sort").addEventListener("change",e=>{S.sort=e.target.value;update()});
+
+hero();renderStatic();renderMonths();initSug();
+$("citylist").innerHTML=CITIES.map(c=>`<option value="${esc(c[1])}"></option>`).join("");
+fetch("data.json",{cache:"no-store"}).then(r=>{if(!r.ok)throw 0;return r.json()}).then(j=>{D=j;renderStatic();update();showDetail()})
+.catch(()=>{$("results").innerHTML=`<div class="empty">${esc(T[L].loadErr)}</div>`});
+}
+</script>
+<script>if("serviceWorker" in navigator){window.addEventListener("load",()=>{navigator.serviceWorker.register("sw.js").catch(()=>{})})}</script>
+</body>
+</html>

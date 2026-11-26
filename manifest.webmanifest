@@ -1,0 +1,66 @@
+{
+ "name": "Destinauta · Travel finder",
+ "short_name": "Destinauta",
+ "description": "¿Dónde viajar cada mes? Destinos según el clima, los riesgos, los documentos, las vacunas, el presupuesto y el transporte. / Where to travel each month?",
+ "lang": "es",
+ "start_url": "./index.html",
+ "scope": "./",
+ "id": "./",
+ "display": "standalone",
+ "orientation": "any",
+ "background_color": "#8fd3f4",
+ "theme_color": "#6d1a2a",
+ "categories": [
+  "travel"
+ ],
+ "icons": [
+  {
+   "src": "icon-192.png",
+   "sizes": "192x192",
+   "type": "image/png",
+   "purpose": "any"
+  },
+  {
+   "src": "icon-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "any"
+  },
+  {
+   "src": "icon-maskable-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "maskable"
+  }
+ ],
+ "screenshots": [
+  {
+   "src": "screenshots/1-inicio.png",
+   "sizes": "1080x1920",
+   "type": "image/png",
+   "form_factor": "narrow",
+   "label": "Inicio"
+  },
+  {
+   "src": "screenshots/2-destinos.png",
+   "sizes": "1080x1920",
+   "type": "image/png",
+   "form_factor": "narrow",
+   "label": "Destinos del mes"
+  },
+  {
+   "src": "screenshots/3-destino.png",
+   "sizes": "1080x1920",
+   "type": "image/png",
+   "form_factor": "narrow",
+   "label": "Ficha de destino"
+  },
+  {
+   "src": "screenshots/4-info.png",
+   "sizes": "1080x1920",
+   "type": "image/png",
+   "form_factor": "narrow",
+   "label": "Comida típica y clima"
+  }
+ ]
+}
