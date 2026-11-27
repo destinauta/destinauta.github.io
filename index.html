@@ -494,8 +494,8 @@ const TX = {
     dVac: 'Vacunas y salud', mand: 'Obligatoria', recom: 'Recomendadas', healthRisks: 'Riesgos de salud', noVacMand: 'Ninguna vacuna obligatoria.', sanidad: 'Centros de Vacunación Internacional',
     yfIfRisk: 'Certificado de fiebre amarilla solo si llegas desde un país con riesgo.', yfAll: 'Certificado de fiebre amarilla obligatorio para todos los viajeros.',
     dSec: 'Seguridad y situación política', dCar: '¿Necesito coche?', dSee: 'Qué ver y hacer', nearbyT: 'Excursiones cerca', dFood: 'Comida local para probar', foodFind: 'Dónde comerlo',
-    dBudget: 'Presupuesto aproximado', bGet: 'Llegar y volver', bStay: 'Alojamiento', bFood: 'Comida', bLocal: 'Transporte local', bAct: 'Actividades', bIns: 'Seguro',
-    budgetNote: 'Estimación orientativa en euros. No incluye visados ni tasas turísticas.',
+    dBudget: 'Presupuesto aproximado', bGet: 'Llegar y volver', bStay: 'Alojamiento', bFood: 'Comida', bLocal: 'Transporte local', bAct: 'Actividades', bIns: 'Seguro', bEntry: 'Trámites de entrada', healthT: 'Salud', zikaN: 'Zika: desaconsejado en el embarazo y si buscas embarazo.', yfc: 'Certificado de fiebre amarilla obligatorio si llegas desde un país con riesgo (o tras una escala larga en él).', cvi: 'Pide cita en un Centro de Vacunación Internacional (Sanidad Exterior) 4–8 semanas antes del viaje.',
+    budgetNote: 'Estimación orientativa con precios medios. Julio, agosto y diciembre encarecen el viaje de ida y vuelta un 25 %.',
     dMove: 'Cómo moverse', airport: 'Desde y hasta el aeropuerto', around: 'Por la zona', trips: 'Pueblos y atracciones cercanas', apps: 'Apps útiles', companies: 'Compañías de transporte, ferris y excursiones',
     dDrive: 'Cómo llegar en coche', noDrive: 'No se puede llegar en coche desde', driveKm: 'Distancia aproximada', driveH: 'Conducción', openRoute: 'Abrir ruta en Google Maps', ferryVia: 'Incluye ferri desde',
     dBook: 'Reservar', bookNote: 'Enlaces con la búsqueda rellenada (fechas de ejemplo: el 15 del mes elegido).',
@@ -535,8 +535,8 @@ const TX = {
     dVac: 'Vaccines & health', mand: 'Mandatory', recom: 'Recommended', healthRisks: 'Health risks', noVacMand: 'No mandatory vaccines.', sanidad: 'International Vaccination Centres',
     yfIfRisk: 'Yellow-fever certificate only if arriving from a risk country.', yfAll: 'Yellow-fever certificate required for all travellers.',
     dSec: 'Security & political situation', dCar: 'Do I need a car?', dSee: 'Things to see and do', nearbyT: 'Nearby trips', dFood: 'Local food to try', foodFind: 'Where to eat it',
-    dBudget: 'Approximate budget', bGet: 'Getting there and back', bStay: 'Accommodation', bFood: 'Food', bLocal: 'Local transport', bAct: 'Activities', bIns: 'Insurance',
-    budgetNote: 'Rough estimate in euros. Visas and tourist taxes not included.',
+    dBudget: 'Approximate budget', bGet: 'Getting there and back', bStay: 'Accommodation', bFood: 'Food', bLocal: 'Local transport', bAct: 'Activities', bIns: 'Insurance', bEntry: 'Entry paperwork', healthT: 'Health', zikaN: 'Zika: not advised if pregnant or trying to conceive.', yfc: 'Yellow-fever certificate required if arriving from a risk country (or after a long layover in one).', cvi: 'Book an appointment at an International Vaccination Centre (Sanidad Exterior) 4–8 weeks before travelling.',
+    budgetNote: 'Rough estimate at average prices. July, August and December make the return journey about 25% dearer.',
     dMove: 'Getting around', airport: 'To and from the airport', around: 'Around the area', trips: 'Nearby towns and attractions', apps: 'Useful apps', companies: 'Transport, ferry and tour companies',
     dDrive: 'Driving there', noDrive: "Can't be reached by car from", driveKm: 'Approximate distance', driveH: 'Driving', openRoute: 'Open route in Google Maps', ferryVia: 'Includes a ferry from',
     dBook: 'Book', bookNote: 'Links with the search filled in (example dates: the 15th of the chosen month).',
@@ -549,8 +549,9 @@ const TX = {
 const L = {
   tags: { es: { b: 'Playa', m: 'Montaña', c: 'Gran ciudad', i: 'Islas', d: 'Desierto', j: 'Selva y bosque', l: 'Lagos' }, en: { b: 'Beach', m: 'Mountains', c: 'Big city', i: 'Islands', d: 'Desert', j: 'Jungle & forest', l: 'Lakes' } },
   sty: { es: { cu: 'Cultura', na: 'Naturaleza', re: 'Relax', ad: 'Aventura', ga: 'Gastronomía', ni: 'Vida nocturna', fa: 'En familia', ro: 'Romántico' }, en: { cu: 'Culture', na: 'Nature', re: 'Relaxing', ad: 'Adventure', ga: 'Food & drink', ni: 'Nightlife', fa: 'Family', ro: 'Romantic' } },
-  haz: { es: { hu: 'Huracanes y ciclones', mo: 'Monzón', fi: 'Incendios forestales', eq: 'Terremotos', vo: 'Volcanes', fl: 'Inundaciones', he: 'Calor extremo', sa: 'Tormentas de arena', av: 'Aludes', ts: 'Tsunamis' },
-    en: { hu: 'Hurricanes & cyclones', mo: 'Monsoon', fi: 'Wildfires', eq: 'Earthquakes', vo: 'Volcanoes', fl: 'Floods', he: 'Extreme heat', sa: 'Sandstorms', av: 'Avalanches', ts: 'Tsunamis' } },
+  haz: { es: { fi: 'Incendios forestales', eq: 'Terremotos', vo: 'Actividad volcánica', he: 'Calor extremo', fl: 'Inundaciones', mo: 'Lluvias monzónicas', ty: 'Tifones', hu: 'Huracanes', sw: 'Temporales', av: 'Nevadas y aludes', cd: 'Frío extremo', sa: 'Polvo y arena', ai: 'Contaminación', sg: 'Sargazo', cy: 'Ciclones' },
+    en: { fi: 'Wildfires', eq: 'Earthquakes', vo: 'Volcanic activity', he: 'Extreme heat', fl: 'Floods', mo: 'Monsoon rains', ty: 'Typhoons', hu: 'Hurricanes', sw: 'Storms', av: 'Snowstorms & avalanches', cd: 'Extreme cold', sa: 'Dust & sandstorms', ai: 'Air pollution', sg: 'Sargassum seaweed', cy: 'Cyclones' } },
+  mal: { es: ['Sin malaria', 'Malaria solo en algunas zonas', 'Malaria: profilaxis recomendada'], en: ['No malaria', 'Malaria in some areas only', 'Malaria: prophylaxis advised'] },
   doc: { es: { dni: 'DNI', pas: 'Pasaporte, sin visado', eta: 'Autorización online', ev: 'eVisa', voa: 'Visado a la llegada', vis: 'Visado en embajada' },
     en: { dni: 'ID card', pas: 'Passport, no visa', eta: 'Online authorisation', ev: 'eVisa', voa: 'Visa on arrival', vis: 'Embassy visa' } },
   docLong: { es: { dni: 'Basta con el DNI en vigor (también vale el pasaporte).', pas: 'Pasaporte con validez mínima de 6 meses. No hace falta visado para estancias turísticas cortas.', eta: 'Pasaporte y autorización electrónica de viaje solicitada online antes de salir.', ev: 'Pasaporte y visado electrónico solicitado online antes de viajar.', voa: 'Pasaporte; el visado se obtiene a la llegada (a menudo también online). Lleva efectivo o tarjeta para la tasa.', vis: 'Pasaporte y visado tramitado antes en la embajada o consulado.' },
@@ -627,7 +628,13 @@ const save = () => { store.set('lang', S.lang); store.set('month', S.month); sto
 /* ---------- geography ---------- */
 function km(a, b, c, d) { const R = 6371, r = Math.PI / 180, x = Math.sin((c - a) * r / 2) ** 2 + Math.cos(a * r) * Math.cos(c * r) * Math.sin((d - b) * r / 2) ** 2; return 2 * R * Math.asin(Math.sqrt(x)); }
 const distTo = d => km(S.origin.la, S.origin.lo, d.la, d.lo);
-function flightH(d) { const k = distTo(d); if (k < 150) return 0; return k / 800 + 0.7 + (k > 7500 ? 1.8 : 0); }
+const fhRaw = k => k < 150 ? 0 : k / 800 + 0.7 + (k > 7500 ? 1.8 : 0);
+const MAD = { la: 40.42, lo: -3.70 };
+function flightH(d) {
+  const k = distTo(d); if (k < 150) return 0;
+  if (!d.fh) return fhRaw(k);
+  return Math.max(0.5, d.fh + fhRaw(k) - fhRaw(km(MAD.la, MAD.lo, d.la, d.lo)));
+}
 const fmtH = h => { const hh = Math.floor(h), mm = Math.round((h - hh) * 60 / 5) * 5; return `${hh} h${mm ? ' ' + String(mm).padStart(2, '0') + (S.lang === 'es' ? ' min' : 'm') : ''}`; };
 /* reachable by road (with or without ferry)? returns {km, ferry} or null */
 function road(d) {
@@ -654,7 +661,7 @@ function season(d, m) {
   const list = north ? ['win', 'spr', 'sum', 'aut'] : ['sum', 'aut', 'win', 'spr'];
   return lab('seas', list[k]);
 }
-const hazNow = (d, m) => Object.keys(d.hz).filter(k => d.hz[k].includes(m + 1) && !(d.hz[k].length === 12 && (k === 'eq' || k === 'vo' || k === 'ts')) );
+const hazNow = (d, m) => Object.keys(d.hz).filter(k => d.hz[k].includes(m + 1) && !(d.hz[k].length === 12 && (k === 'eq' || k === 'vo' || k === 'ai')) );
 const hazAllYear = d => Object.keys(d.hz).filter(k => d.hz[k].length === 12);
 const DOC_TIER = { dni: 0, pas: 1, eta: 2, ev: 3, voa: 3, vis: 4 };
 
@@ -664,8 +671,10 @@ function budget(d, c = S.c) {
   const k = distTo(d), rd = road(d);
   let get = 0, getNote = '';
   if (c.get === 'eco' || c.get === 'flex') {
-    get = Math.max(60, 35 + 0.075 * k) * (c.get === 'flex' ? 1.8 : 1) * p;
-    if (d.tm === 'sp' || d.tm === 'sb') get += (d.tm === 'sp' ? 450 : 90) * p; // seaplane / speedboat transfer
+    const fare = x => Math.max(60, 35 + 0.075 * x);
+    const base = d.fx ? d.fx * fare(k) / fare(km(MAD.la, MAD.lo, d.la, d.lo)) : fare(k);
+    get = Math.max(40, base) * (c.get === 'flex' ? 1.8 : 1) * p * ([6, 7, 11].includes(S.month) ? 1.25 : 1);
+    if (!d.fx && (d.tm === 'sp' || d.tm === 'sb')) get += (d.tm === 'sp' ? 450 : 90) * p; // seaplane / speedboat transfer
   } else if (c.get === 'ground') {
     if (rd) get = (0.11 * rd.km * 2 + (rd.ferry ? 90 : 0)) * p;
   } else if (c.get === 'car') {
@@ -678,7 +687,7 @@ function budget(d, c = S.c) {
   const actD = { low: 8, mid: 22, high: 55 }[c.act] * ci * p;
   const far = k > 4000 ? 1.4 : 1;
   const ins = c.ins === 'none' ? 0 : Math.max(c.ins === 'full' ? 30 : 15, (c.ins === 'full' ? 5 : 2.5) * n * far) * p;
-  const parts = { get, stay: stayN * n, food: foodD * n, local: localD * n, act: actD * n, ins };
+  const parts = { get, stay: stayN * n, food: foodD * n, local: localD * n, act: actD * n, ins, entry: (d.ef || 0) * p };
   const total = Object.values(parts).reduce((a, b) => a + b, 0);
   return { parts, total, pp: total / p, daily: (total - get) / n / p };
 }
@@ -838,7 +847,7 @@ const tcol = v => v < 5 ? '#3d7ea6' : v < 12 ? '#5aa0b8' : v < 18 ? '#7bb37c' : 
 const CARK = ['no', 'rec', 'need', 'drv'];
 const HZLEVEL = { hu: 3, ts: 3, vo: 2, fi: 2, fl: 2, he: 2, mo: 2, sa: 2, av: 2, eq: 1 };
 const seasonalHaz = d => Object.keys(d.hz).filter(k => d.hz[k].length < 12);
-const isIdeal = (d, m) => d.sc <= 2 && d.T[m] >= 20 && d.T[m] <= 31 && d.R[m] <= 6 && !seasonalHaz(d).some(k => d.hz[k].includes(m + 1));
+const isIdeal = (d, m) => d.sc <= 2 && d.T[m] >= 20 && d.T[m] <= 31 && d.R[m] <= 6 && !seasonalHaz(d).some(k => d.hz[k].includes(m + 1) && (d.hv[k] || 2) >= 2);
 const tier = d => d.ci <= 0.7 ? 1 : d.ci <= 1.3 ? 2 : 3;
 const ownCar = () => S.c.get === 'car' || S.c.get === 'ground';
 const driveH = rd => Math.max(1, Math.round(rd.km / 80 + Math.floor(rd.km / 400) * 0.25));
@@ -875,39 +884,44 @@ function vaxLine(d) {
   const req = d.vm === 1 ? [L.vac[S.lang].yf] : [];
   const rec = d.vr.map(v => L.vac[S.lang][v]);
   let s = `<b>${esc(t('vx'))}.</b> ${esc(t('vxReq'))}: ${req.length ? esc(req.join(', ')) : esc(t('vxNone'))}${d.vm === 2 ? ' (' + esc(t('yfIfRisk')).replace(/\.$/, '').toLowerCase() + ')' : ''}. ${esc(t('vxRec'))}: ${rec.length ? esc(rec.join(', ')) : esc(t('vxRoutine'))}.`;
-  s += `<br><b>${esc(t('hrT'))}:</b> ${d.rk.length ? esc(d.rk.map(r => lab('risk', r)).join(', ')) : esc(t('hrNone'))}.`;
+  s += ` ${esc(L.mal[S.lang][d.ml || 0])}.`;
+  const rk = d.rk.filter(r => r !== 'ma');
+  s += `<br><b>${esc(t('hrT'))}:</b> ${rk.length ? esc(rk.map(r => lab('risk', r)).join(', ')) : esc(t('hrNone'))}.`;
+  if (d.zn) s += ` ${esc(t('zikaN'))}`;
   return s;
 }
 function card(d, i, full) {
   const m = S.month, es = S.lang === 'es', b = budget(d), rd = road(d), fh = flightH(d);
   const seas = seasonalHaz(d).filter(k => d.hz[k].includes(m + 1)), yr = Object.keys(d.hz).filter(k => d.hz[k].length === 12);
-  const hzP = [...seas.map(k => `<span class="pill p${HZLEVEL[k] || 2}">${esc(lab('haz', k))}</span>`), ...yr.map(k => `<span class="pill p1">${esc(lab('haz', k))} · ${esc(t('allYear'))}</span>`)].join('') || `<span class="pill">${esc(t('noHz'))}</span>`;
+  const hzP = [...seas.map(k => `<span class="pill p${(d.hv[k] || 2)}">${esc(lab('haz', k))}</span>`), ...yr.map(k => `<span class="pill p${d.hv[k] || 1}">${esc(lab('haz', k))} · ${esc(t('allYear'))}</span>`)].join('') || `<span class="pill">${esc(t('noHz'))}</span>`;
   const maxT = Math.max(...d.T, 30), minT = Math.min(...d.T, 0), rng = maxT - minT || 1;
   const mrow = Array.from({ length: 12 }, (_, j) => `<div class="m${j === m ? ' on' : ''}">${esc(monthName(j, 'narrow'))}</div>`).join('');
   const tempBars = d.T.map(v => `<div class="tb" title="${v}°"><i style="height:${Math.max(6, (v - minT) / rng * 100)}%;background:${tcol(v)}"></i></div>`).join('');
   const rainCells = d.R.map(v => `<div class="cell" title="${v}" style="background:color-mix(in srgb,var(--teal) ${Math.min(100, v * 4.5)}%,var(--soft))"></div>`).join('');
-  const riskCells = d.T.map((_, j) => { const s = Math.max(0, ...seasonalHaz(d).filter(k => d.hz[k].includes(j + 1)).map(k => HZLEVEL[k] || 2)); return `<div class="cell${s ? ' p' + s : ''}"></div>`; }).join('');
+  const riskCells = d.T.map((_, j) => { const s = Math.max(0, ...seasonalHaz(d).filter(k => d.hz[k].includes(j + 1)).map(k => (d.hv[k] || 2))); return `<div class="cell${s ? ' p' + s : ''}"></div>`; }).join('');
   const byCar = ownCar() && rd;
   const stamp = byCar ? CARSVG.replace('fill="currentColor"', 'fill="#6d1a2a"') + driveH(rd) + ' h' : PLANE + (fh ? fmtH(fh) : '—');
   const ck = CARK[d.car];
-  const hzAll = Object.keys(d.hz).map(k => { const ms = d.hz[k]; return `<span class="pill p${ms.length === 12 ? 1 : HZLEVEL[k] || 2}">${esc(lab('haz', k))}: ${ms.length === 12 ? esc(t('allYear')) : ms.map(x => esc(monthName(x - 1, 'short').replace('.', ''))).join(', ')}</span>`; }).join('');
+  const hzAll = Object.keys(d.hz).map(k => { const ms = d.hz[k]; return `<span class="pill p${(d.hv[k] || 1)}">${esc(lab('haz', k))}: ${ms.length === 12 ? esc(t('allYear')) : ms.map(x => esc(monthName(x - 1, 'short').replace('.', ''))).join(', ')}</span>`; }).join('');
   const P = b.parts;
   const sights = full ? d.si.map(s => `<li><a href="${esc(mapsQ(s + ', ' + d.en.replace(/\s*\(.*\)/, '') + ', ' + countryName(d.cc)))}" target="_blank" rel="noopener">${esc(s)}</a></li>`).join('') : d.si.map(s => `<li>${esc(s)}</li>`).join('');
   return `<article class="card${full ? ' full' : ''}" data-id="${esc(d.id)}"><div class="post" data-open="${esc(d.id)}">${scene(d, i)}${isIdeal(d, m) ? `<span class="ideal">${esc(t('ideal'))}</span>` : ''}<span class="stamp">${stamp}</span>${d.sc >= 3 ? `<span class="warnflag w${d.sc}">${esc(lab('sec', d.sc))}</span>` : ''}</div><div class="body">
-<h4 data-open="${esc(d.id)}">${flag(d.cc)} ${esc(countryName(d.cc))} · ${esc(nm(d))}</h4>
+<h4 data-open="${esc(d.id)}">${flag(d.cc)} ${countryName(d.cc) === nm(d) || /^(Granada|Grenada) \(/.test(nm(d)) ? '' : esc(countryName(d.cc)) + ' · '}${esc(nm(d))}</h4>
 ${full ? `<div class="carbox car-${ck}">${CARSVG}<b>${esc(t('car'))} ${esc(lab('car', d.car))}.</b> ${esc(L.carLong[S.lang][d.car])}</div>` : ''}
 <div class="stats"><div><b>${d.T[m]}°</b><span>${esc(t('hi'))}</span></div><div><b>${d.R[m]}</b><span>${esc(t('rd'))}</span></div>${byCar ? `<div><b>${driveH(rd)} h</b><span>${esc(t('drv'))}</span></div>` : `<div><b>${fh ? (Math.round(fh * 2) / 2).toLocaleString(S.lang) + ' h' : '—'}</b><span>${esc(t('fl'))}</span></div>`}<div><b>${'€'.repeat(tier(d))}</b><span>${esc(t('bud'))}</span></div></div>
 <div class="pills">${hzP}</div>
 <div class="cost"><small>${esc(t('costT')(S.c.days, S.c.pax))}</small><b>${money(b.total)}</b><small>≈ ${money(b.pp)} ${esc(t('perP'))}</small></div>
 <div class="sec s${d.sc}"><b>${esc(t('secT'))}: ${esc(lab('sec', d.sc))}</b>${d.ne ? esc(es ? d.ne : d.nn) : esc(es ? 'Precauciones normales, como en cualquier viaje.' : 'Normal precautions, as on any trip.')}</div>
-<div class="doc"><b>${esc(lab('doc', d.dc))}.</b> ${esc(L.docLong[S.lang][d.dc])}</div>
+<div class="doc"><b>${esc(lab('doc', d.dc))}.</b> ${esc(es ? d.dt : d.dn)}</div>
 <div class="doc vx">${vaxLine(d)}</div>
 <div class="pills">${d.tg.map(x => `<span class="pill">${esc(lab('tags', x))}</span>`).join('')}${d.st.slice(0, full ? 9 : 2).map(x => `<span class="pill">${esc(lab('sty', x))}</span>`).join('')}<span class="pill car-${ck}">${CARSVG}${esc(lab('car', d.car))}</span></div>
 <ul class="see">${sights}</ul>${full ? `<div class="eat"><b>${esc(t('eat'))}</b>${d.fd.map(f => `<a href="${esc(mapsQ(f + ' ' + d.en.replace(/\s*\(.*\)/, '')))}" target="_blank" rel="noopener">${esc(f)}</a>`).join('')}</div>` : ''}
 <details${full ? ' open' : ''}><summary>${esc(t('more'))}</summary>
 <div class="cal"><span></span>${mrow}<span class="l">${esc(t('tempRow'))}</span>${tempBars}<span class="l">${esc(t('rainRow'))}</span>${rainCells}<span class="l">${esc(t('riskRow'))}</span>${riskCells}</div>
 <div class="pills">${hzAll || `<span class="pill">${esc(t('hazNone'))}</span>`}</div>
-<p class="meta"><b>${esc(t('bGet'))}:</b> ${money(P.get)} · <b>${esc(t('bStay'))}:</b> ${money(P.stay)} · <b>${esc(t('bFood'))}:</b> ${money(P.food)} · <b>${esc(t('bLocal'))}:</b> ${money(P.local)} · <b>${esc(t('bAct'))}:</b> ${money(P.act)} · <b>${esc(t('bIns'))}:</b> ${money(P.ins)}<br>${esc(t('budgetNote'))}</p>
+<p class="meta"><b>${esc(t('bGet'))}:</b> ${money(P.get)} · <b>${esc(t('bStay'))}:</b> ${money(P.stay)} · <b>${esc(t('bFood'))}:</b> ${money(P.food)} · <b>${esc(t('bLocal'))}:</b> ${money(P.local)} · <b>${esc(t('bAct'))}:</b> ${money(P.act)} · <b>${esc(t('bIns'))}:</b> ${money(P.ins)}${P.entry ? ` · <b>${esc(t('bEntry'))}:</b> ${money(P.entry)}` : ''}<br>${esc(t('budgetNote'))}</p>
+<p class="meta"><b>${esc(t('healthT'))}:</b> ${esc(es ? d.h : d.hn)}${d.yc ? ' ' + esc(t('yfc')) : ''} ${esc(t('cvi'))}</p>
+<p class="meta">${esc(es ? d.inf : d.infn)}</p>
 <p class="meta"><b>${esc(t('season'))}:</b> ${esc(season(d, m))} · <b>${esc(t('fromCity'))}:</b> ${esc(S.origin.n)} (${esc(S.origin.ap)})${rd ? ` · ${rd.km.toLocaleString(S.lang)} km ${es ? 'por carretera' : 'by road'}` : ''}</p>
 <p class="meta"><a href="https://www.exteriores.gob.es/es/ServiciosAlCiudadano/Paginas/Recomendaciones-de-viaje.aspx" target="_blank" rel="noopener">${esc(t('maec'))}</a></p>
 </details>${full ? '' : `<button type="button" class="open" data-open="${esc(d.id)}">${esc(t('openD'))} →</button>`}</div></article>`;
@@ -1004,17 +1018,64 @@ function readCalc(prefix) {
 
 /* ---------- news ---------- */
 const NEWS = [
-  { cc: 'GB', es: ['Reino Unido', 'Desde el 2 de abril de 2025 los ciudadanos de la UE necesitan una ETA (autorización electrónica) para entrar. Cuesta 16 £ y vale dos años.'], en: ['United Kingdom', 'Since 2 April 2025 EU citizens need an ETA (electronic travel authorisation). It costs £16 and lasts two years.'], u: 'https://www.gov.uk/eta' },
-  { cc: 'US', es: ['Estados Unidos', 'La ESTA cuesta 40 $ desde el 30 de septiembre de 2025. Solicítala al menos 72 horas antes y solo en la web oficial.'], en: ['United States', 'ESTA costs $40 since 30 September 2025. Apply at least 72 hours ahead and only on the official site.'], u: 'https://esta.cbp.dhs.gov' },
-  { cc: 'CN', es: ['China', 'Los españoles pueden entrar sin visado hasta 30 días (turismo y negocios). La medida está prorrogada hasta el 31 de diciembre de 2026.'], en: ['China', 'Spanish citizens can enter visa-free for up to 30 days (tourism and business). The scheme runs until 31 December 2026.'], u: 'https://www.exteriores.gob.es/es/ServiciosAlCiudadano/Paginas/Recomendaciones-de-viaje.aspx' },
-  { cc: 'TH', es: ['Tailandia', 'La tarjeta de llegada digital (TDAC) es obligatoria desde el 1 de mayo de 2025. Se rellena online en los 3 días previos a la llegada.'], en: ['Thailand', 'The digital arrival card (TDAC) has been mandatory since 1 May 2025. Fill it in online within 3 days before arrival.'], u: 'https://tdac.immigration.go.th' },
-  { cc: 'ID', es: ['Bali (Indonesia)', 'Bali cobra una tasa turística de 150.000 rupias por persona. No se aplica en las islas Gili, que pertenecen a Lombok.'], en: ['Bali (Indonesia)', 'Bali charges a tourist levy of IDR 150,000 per person. It does not apply on the Gili Islands, which belong to Lombok.'], u: 'https://lovebali.baliprov.go.id' },
-  { cc: 'IL', es: ['Israel', 'Para viajar sin visado hace falta la autorización ETA-IL, solicitada online antes de salir.'], en: ['Israel', 'Visa-free travellers need an ETA-IL authorisation, applied for online before departure.'], u: 'https://israel-entry.piba.gov.il' },
-  { cc: 'KE', es: ['Kenia', 'Todos los visitantes necesitan una eTA (autorización electrónica) antes de viajar; ya no se emite visado a la llegada.'], en: ['Kenya', 'All visitors need an eTA (electronic travel authorisation) before travelling; visas are no longer issued on arrival.'], u: 'https://www.etakenya.go.ke' },
-  { cc: 'SC', es: ['Seychelles', 'Es obligatorio pedir la Travel Authorization online antes del viaje.'], en: ['Seychelles', 'A Travel Authorization must be requested online before the trip.'], u: 'https://seychelles.govtas.com' }
+ {
+  "d": "2026-11-25",
+  "cc": "",
+  "es": "Oriente Próximo: por el conflicto regional, Exteriores aconseja aplazar los viajes a Emiratos (Dubái) y Jordania. La agencia europea de seguridad aérea mantiene su aviso para la zona hasta enero de 2027.",
+  "en": "Middle East: because of the regional conflict, Spain advises postponing travel to the UAE (Dubai) and Jordan. The EU aviation safety agency keeps its warning for the area in force until January 2027."
+ },
+ {
+  "d": "2026-11-26",
+  "cc": "TZ",
+  "es": "Tanzania mantiene tensión política tras las elecciones de 2025, y Cuba sufre una grave crisis energética con apagones generales. Revisa la situación antes de reservar.",
+  "en": "Tanzania remains politically tense after the 2025 election, and Cuba is suffering a severe energy crisis with nationwide blackouts. Check the situation before booking."
+ },
+ {
+  "d": "2026-11-26",
+  "cc": "CN",
+  "es": "China: la exención de visado de 30 días para españoles vence el 31/12/2026. China ha dicho que estudia prorrogarla: compruébalo antes de reservar viajes para 2027.",
+  "en": "China: the 30-day visa waiver for Spaniards expires on 31/12/2026. China says it is considering an extension: check before booking trips for 2027."
+ },
+ {
+  "d": "2026-11-26",
+  "cc": "KR",
+  "es": "Corea del Sur: la exención temporal de K-ETA para España termina el 31/12/2026. A partir de 2027 puede ser obligatorio solicitarla (10.000 KRW).",
+  "en": "South Korea: the temporary K-ETA waiver for Spain ends on 31/12/2026. From 2027 it may be compulsory (KRW 10,000)."
+ },
+ {
+  "d": "2026-11-26",
+  "cc": "EG",
+  "es": "Egipto: la tasa del visado de turista sube de 25 a 33 USD a partir del 1/1/2027.",
+  "en": "Egypt: the tourist visa fee rises from USD 25 to USD 33 from 1/1/2027."
+ },
+ {
+  "d": "2026-09-15",
+  "cc": "TH",
+  "es": "Tailandia: desde el 15/9/2026 la estancia sin visado baja de 60 a 30 días. La tarjeta digital de llegada (TDAC) es obligatoria.",
+  "en": "Thailand: since 15/9/2026 the visa-free stay is down from 60 to 30 days. The digital arrival card (TDAC) is compulsory."
+ },
+ {
+  "d": "2026-04-08",
+  "cc": "GB",
+  "es": "Reino Unido: la ETA es obligatoria desde el 25/2/2026 y cuesta 20 £ desde abril de 2026. Vale 2 años.",
+  "en": "United Kingdom: the ETA has been compulsory since 25/2/2026 and costs £20 since April 2026. It lasts 2 years."
+ },
+ {
+  "d": "2026-11-26",
+  "cc": "JP",
+  "es": "Japón: la autorización electrónica JESTA no empezará antes del año fiscal 2028. De momento basta con el pasaporte.",
+  "en": "Japan: the JESTA electronic authorisation will not start before fiscal year 2028. For now a passport is enough."
+ },
+ {
+  "d": "2026-11-26",
+  "cc": "",
+  "es": "Salud: en 2026 hay brotes de chikungunya en el noroeste de Costa Rica (Guanacaste) y en Filipinas, y mucho dengue en Sri Lanka y Ecuador. Usa repelente y ropa larga.",
+  "en": "Health: in 2026 there are chikungunya outbreaks in north-west Costa Rica (Guanacaste) and the Philippines, and a lot of dengue in Sri Lanka and Ecuador. Use repellent and long clothing."
+ }
 ];
 function renderNews() {
-  $('#newsList').innerHTML = NEWS.map(n => { const [h, p] = n[S.lang]; return `<div class="alert"><time>${flag(n.cc)} ${esc(h)}</time>${esc(p)}<br><a href="${n.u}" target="_blank" rel="noopener">${esc(new URL(n.u).hostname)} ↗</a></div>`; }).join('');
+  const f = s => new Intl.DateTimeFormat(S.lang, { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(s + 'T12:00:00'));
+  $('#newsList').innerHTML = NEWS.map(n => `<div class="alert"><time>${n.cc ? flag(n.cc) + ' ' : ''}${esc(f(n.d))}</time>${esc(n[S.lang])}</div>`).join('');
 }
 function renderFooter() {
   const f = d => d ? new Intl.DateTimeFormat(S.lang, { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(d + 'T12:00:00')) : '';
@@ -1090,7 +1151,7 @@ function openDetail(id, keepScroll) {
  <p class="meta">${esc(t('bookNote'))} ${esc(t('dates'))}: ${dt.a} → ${dt.b}${fh ? ` · ✈ ${fmtH(fh)}${distTo(d) > 7500 ? ' (' + t('stopLikely') + ')' : ''}` : ''}</p>
  <p class="gh">${esc(t('official'))}</p><ul class="offl">${off.map(([n, u]) => `<li><a href="${esc(u)}" target="_blank" rel="noopener">${esc(n)} ↗</a></li>`).join('')}</ul></section>
 <section><h3 class="sh">${esc(t('dBudget'))}</h3>${calcControls('d_')}
- <div class="cost"><table class="btable"><tbody>${row('bGet', P.get)}${row('bStay', P.stay)}${row('bFood', P.food)}${row('bLocal', P.local)}${row('bAct', P.act)}${row('bIns', P.ins)}</tbody><tfoot><tr><th>${esc(t('total'))}</th><td>${money(b.total)}</td></tr><tr><th>${esc(t('perPerson'))}</th><td>${money(b.pp)}</td></tr></tfoot></table></div>
+ <div class="cost"><table class="btable"><tbody>${row('bGet', P.get)}${row('bStay', P.stay)}${row('bFood', P.food)}${row('bLocal', P.local)}${row('bAct', P.act)}${row('bIns', P.ins)}${P.entry ? row('bEntry', P.entry) : ''}</tbody><tfoot><tr><th>${esc(t('total'))}</th><td>${money(b.total)}</td></tr><tr><th>${esc(t('perPerson'))}</th><td>${money(b.pp)}</td></tr></tfoot></table></div>
  ${ownCar() && !rd ? `<p class="note">${esc(t('noDrive'))} ${esc(o.n)}.</p>` : ''}${S.c.food === 'menu' ? `<p class="meta">${es ? 'Comida calculada con restaurantes de menú del día (o el equivalente local a mediodía).' : 'Food is based on set-menu (menú del día) restaurants or the local lunchtime equivalent.'}</p>` : ''}<p class="meta">${esc(t('budgetNote'))}</p></section>
 <section><h3 class="sh">${esc(t('dMove'))}</h3>
  <p class="gh">${esc(t('airport'))}</p><ul class="tlist"><li><span class="mode m-${TRMODE[d.tm]}">${esc(lab('tr', d.tm))}</span><span>${esc(trTxt)}</span></li></ul>
