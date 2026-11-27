@@ -1,0 +1,25 @@
+DESTINAUTA - APLICACIÓN INSTALABLE (PWA)
+
+Contenido
+- index.html            La aplicación
+- data.json             Los 253 destinos (es lo que cambia en cada revisión de temporada)
+- sw.js                 Permite usarla sin conexión y recoger los datos nuevos solos
+- manifest.webmanifest  Nombre, colores e iconos para instalarla
+- privacidad.html       Política de privacidad (la pide Google Play)
+- icons/                Iconos de la aplicación
+
+Cómo publicarla (GitHub Pages)
+1. Sube TODO el contenido de esta carpeta a la raíz del repositorio (rama main).
+2. En el repositorio: Settings > Pages > Source: Deploy from a branch > main > / (root) > Save.
+3. A los 2-3 minutos estará en https://<tu-usuario>.github.io/<repositorio>/
+
+Cómo instalarla en el móvil
+- Android (Chrome): abre la web, menú ⋮ > Instalar aplicación (o Añadir a pantalla de inicio).
+- iPhone (Safari): abre la web, botón Compartir > Añadir a pantalla de inicio.
+
+APK / AAB para Google Play
+Genera el paquete en https://www.pwabuilder.com escribiendo la dirección de tu web. Como el APK abre la web,
+se actualiza solo cuando cambias data.json en el repositorio.
+
+Nota: abrir index.html con doble clic desde el ordenador no carga los datos (el navegador bloquea data.json en
+archivos locales). Para usarla sin publicar, abre Destinauta.html, que lleva los datos dentro.
