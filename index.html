@@ -915,7 +915,7 @@ ${full ? `<div class="carbox car-${ck}">${CARSVG}<b>${esc(t('car'))} ${esc(lab('
 <div class="doc"><b>${esc(lab('doc', d.dc))}.</b> ${esc(es ? d.dt : d.dn)}</div>
 <div class="doc vx">${vaxLine(d)}</div>
 <div class="pills">${d.tg.map(x => `<span class="pill">${esc(lab('tags', x))}</span>`).join('')}${d.st.slice(0, full ? 9 : 2).map(x => `<span class="pill">${esc(lab('sty', x))}</span>`).join('')}<span class="pill car-${ck}">${CARSVG}${esc(lab('car', d.car))}</span></div>
-<ul class="see">${sights}</ul>${full ? `<div class="eat"><b>${esc(t('eat'))}</b>${d.fd.map(f => `<a href="${esc(mapsQ(f + ' ' + d.en.replace(/\s*\(.*\)/, '')))}" target="_blank" rel="noopener">${esc(f)}</a>`).join('')}</div>` : ''}
+<ul class="see">${sights}</ul>${full ? `<div class="eat"><b>${esc(t('eat'))}</b>${d.fd.map(f => `<a href="https://www.google.com/search?q=${encodeURIComponent(f + ' ' + nm(d).replace(/\s*\(.*\)/, ''))}" target="_blank" rel="noopener">${esc(f)}</a>`).join('')}</div>` : ''}
 <details${full ? ' open' : ''}><summary>${esc(t('more'))}</summary>
 <div class="cal"><span></span>${mrow}<span class="l">${esc(t('tempRow'))}</span>${tempBars}<span class="l">${esc(t('rainRow'))}</span>${rainCells}<span class="l">${esc(t('riskRow'))}</span>${riskCells}</div>
 <div class="pills">${hzAll || `<span class="pill">${esc(t('hazNone'))}</span>`}</div>
