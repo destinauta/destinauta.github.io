@@ -230,6 +230,11 @@ details.cat>.f{padding:0 16px 16px}
 @media(max-width:700px){.months{grid-template-columns:repeat(6,minmax(0,1fr))}.mo{min-height:64px}.mo svg{width:22px;height:22px}}
 @media(max-width:600px){.ov{padding:0}.sheet{max-height:100vh;height:100vh;border-radius:0}.mode{min-width:70px}.ct{font-size:16px}.stats b{font-size:17px}}
 @media(prefers-reduced-motion:reduce){.card,.mo{transition:none}.card:hover{transform:none}}
+.totop{position:fixed;right:max(16px,env(safe-area-inset-right));bottom:max(18px,env(safe-area-inset-bottom));z-index:40;width:52px;height:52px;border-radius:50%;border:0;background:var(--brand);color:#fff;box-shadow:0 6px 18px #0004;display:grid;place-items:center;cursor:pointer;opacity:0;transform:translateY(12px);pointer-events:none;transition:opacity .2s,transform .2s}
+.totop.show{opacity:1;transform:none;pointer-events:auto}
+.totop:focus-visible{outline:3px solid var(--sun);outline-offset:3px}
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+@media (prefers-reduced-motion:reduce){.totop{transition:none}}
 </style>
 </head>
 <body>
@@ -274,6 +279,7 @@ details.cat>.f{padding:0 16px 16px}
   <div class="alerts" id="newsList"></div>
  </div></section>
 </main>
+<button type="button" class="totop" id="toTop"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M12 5l-7 7h4.5v7h5v-7H19z" fill="currentColor"/></svg><span class="vh" data-t="toTop">Subir arriba</span></button>
 
 <footer class="band"><div class="wrap">
  <p data-t="footer"></p>
@@ -494,7 +500,7 @@ const TX = {
     dVac: 'Vacunas y salud', mand: 'Obligatoria', recom: 'Recomendadas', healthRisks: 'Riesgos de salud', noVacMand: 'Ninguna vacuna obligatoria.', sanidad: 'Centros de Vacunación Internacional',
     yfIfRisk: 'Certificado de fiebre amarilla solo si llegas desde un país con riesgo.', yfAll: 'Certificado de fiebre amarilla obligatorio para todos los viajeros.',
     dSec: 'Seguridad y situación política', dCar: '¿Necesito coche?', dSee: 'Qué ver y hacer', nearbyT: 'Excursiones cerca', dFood: 'Comida local para probar', foodFind: 'Dónde comerlo',
-    dBudget: 'Presupuesto aproximado', bGet: 'Llegar y volver', bStay: 'Alojamiento', bFood: 'Comida', bLocal: 'Transporte local', bAct: 'Actividades', bIns: 'Seguro', bEntry: 'Trámites de entrada', healthT: 'Salud', zikaN: 'Zika: desaconsejado en el embarazo y si buscas embarazo.', yfc: 'Certificado de fiebre amarilla obligatorio si llegas desde un país con riesgo (o tras una escala larga en él).', cvi: 'Pide cita en un Centro de Vacunación Internacional (Sanidad Exterior) 4–8 semanas antes del viaje.',
+    dBudget: 'Presupuesto aproximado', bGet: 'Llegar y volver', bStay: 'Alojamiento', bFood: 'Comida', bLocal: 'Transporte local', bAct: 'Actividades', bIns: 'Seguro', bEntry: 'Trámites de entrada', toTop: 'Subir arriba', healthT: 'Salud', zikaN: 'Zika: desaconsejado en el embarazo y si buscas embarazo.', yfc: 'Certificado de fiebre amarilla obligatorio si llegas desde un país con riesgo (o tras una escala larga en él).', cvi: 'Pide cita en un Centro de Vacunación Internacional (Sanidad Exterior) 4–8 semanas antes del viaje.',
     budgetNote: 'Estimación orientativa con precios medios. Julio, agosto y diciembre encarecen el viaje de ida y vuelta un 25 %.',
     dMove: 'Cómo moverse', airport: 'Desde y hasta el aeropuerto', around: 'Por la zona', trips: 'Pueblos y atracciones cercanas', apps: 'Apps útiles', companies: 'Compañías de transporte, ferris y excursiones',
     dDrive: 'Cómo llegar en coche', noDrive: 'No se puede llegar en coche desde', driveKm: 'Distancia aproximada', driveH: 'Conducción', openRoute: 'Abrir ruta en Google Maps', ferryVia: 'Incluye ferri desde',
@@ -535,7 +541,7 @@ const TX = {
     dVac: 'Vaccines & health', mand: 'Mandatory', recom: 'Recommended', healthRisks: 'Health risks', noVacMand: 'No mandatory vaccines.', sanidad: 'International Vaccination Centres',
     yfIfRisk: 'Yellow-fever certificate only if arriving from a risk country.', yfAll: 'Yellow-fever certificate required for all travellers.',
     dSec: 'Security & political situation', dCar: 'Do I need a car?', dSee: 'Things to see and do', nearbyT: 'Nearby trips', dFood: 'Local food to try', foodFind: 'Where to eat it',
-    dBudget: 'Approximate budget', bGet: 'Getting there and back', bStay: 'Accommodation', bFood: 'Food', bLocal: 'Local transport', bAct: 'Activities', bIns: 'Insurance', bEntry: 'Entry paperwork', healthT: 'Health', zikaN: 'Zika: not advised if pregnant or trying to conceive.', yfc: 'Yellow-fever certificate required if arriving from a risk country (or after a long layover in one).', cvi: 'Book an appointment at an International Vaccination Centre (Sanidad Exterior) 4–8 weeks before travelling.',
+    dBudget: 'Approximate budget', bGet: 'Getting there and back', bStay: 'Accommodation', bFood: 'Food', bLocal: 'Local transport', bAct: 'Activities', bIns: 'Insurance', bEntry: 'Entry paperwork', toTop: 'Back to top', healthT: 'Health', zikaN: 'Zika: not advised if pregnant or trying to conceive.', yfc: 'Yellow-fever certificate required if arriving from a risk country (or after a long layover in one).', cvi: 'Book an appointment at an International Vaccination Centre (Sanidad Exterior) 4–8 weeks before travelling.',
     budgetNote: 'Rough estimate at average prices. July, August and December make the return journey about 25% dearer.',
     dMove: 'Getting around', airport: 'To and from the airport', around: 'Around the area', trips: 'Nearby towns and attractions', apps: 'Useful apps', companies: 'Transport, ferry and tour companies',
     dDrive: 'Driving there', noDrive: "Can't be reached by car from", driveKm: 'Approximate distance', driveH: 'Driving', openRoute: 'Open route in Google Maps', ferryVia: 'Includes a ferry from',
@@ -585,6 +591,49 @@ const OPS = {
   JP: [['JR East', 'https://www.jreast.co.jp/en/'], ['JR West', 'https://www.westjr.co.jp/global/en/']], CN: [['China Railway 12306', 'https://www.12306.cn/en/index.html']], IN: [['IRCTC', 'https://www.irctc.co.in']], MY: [['KTMB', 'https://www.ktmb.com.my']], TH: [['State Railway of Thailand', 'https://www.railway.co.th']],
   SC: [['Cat Cocos', 'https://www.catcocos.com']], PF: [['Air Tahiti', 'https://www.airtahiti.com'], ['Terevau', 'https://www.terevau.pf']], US: [['MTA (Nueva York)', 'https://new.mta.info'], ['TheBus (Oahu)', 'https://www.thebus.org']], AU: [['Transport for NSW', 'https://transportnsw.info']], MX: [['ADO', 'https://www.ado.com.mx']], PE: [['PeruRail', 'https://www.perurail.com'], ['Cruz del Sur', 'https://www.cruzdelsur.com.pe']], CL: [['Turbus', 'https://www.turbus.cl']], EC: [['Galápagos: ferris interislas (Rome2rio)', 'https://www.rome2rio.com']]
 };
+/* official national weather services (fallback: WMO World Weather Information Service) */
+const MET = {
+  ES: ['AEMET', 'https://www.aemet.es'], PT: ['IPMA', 'https://www.ipma.pt'], FR: ['Météo-France', 'https://meteofrance.com'], MC: ['Météo-France', 'https://meteofrance.com'], PF: ['Météo-France', 'https://meteofrance.com'],
+  AD: ['Meteo Andorra', 'https://www.meteo.ad'], IT: ['Meteo AM', 'https://www.meteoam.it'], SM: ['Meteo AM', 'https://www.meteoam.it'], VA: ['Meteo AM', 'https://www.meteoam.it'],
+  MT: ['Malta Met Office', 'https://www.maltairport.com/weather/'], GR: ['EMY (HNMS)', 'https://www.emy.gr'], CY: ['Cyprus Met', 'https://www.dom.org.cy'],
+  HR: ['DHMZ', 'https://meteo.hr'], SI: ['ARSO', 'https://meteo.arso.gov.si'], BA: ['FHMZ BiH', 'https://www.fhmzbih.gov.ba'], RS: ['RHMZ Srbije', 'https://www.hidmet.gov.rs'],
+  ME: ['ZHMS', 'https://www.meteo.co.me'], MK: ['UHMR', 'https://uhmr.gov.mk'], BG: ['NIMH', 'https://www.meteo.bg'], RO: ['ANM', 'https://www.meteoromania.ro'],
+  MD: ['Meteo Moldova', 'http://www.meteo.md'], UA: ['Ukrhydrometcenter', 'https://meteo.gov.ua'], BY: ['Belhydromet', 'https://pogoda.by'], RU: ['Hydrometcenter', 'https://meteoinfo.ru'],
+  LT: ['LHMT', 'https://www.meteo.lt'], LV: ['LVĢMC', 'https://videscentrs.lvgmc.lv'], EE: ['Ilmateenistus', 'https://www.ilmateenistus.ee'], FI: ['FMI', 'https://en.ilmatieteenlaitos.fi'],
+  SE: ['SMHI', 'https://www.smhi.se'], NO: ['Yr (MET Norway)', 'https://www.yr.no'], DK: ['DMI', 'https://www.dmi.dk'], IS: ['Veðurstofa', 'https://en.vedur.is'],
+  GB: ['Met Office', 'https://www.metoffice.gov.uk'], IE: ['Met Éireann', 'https://www.met.ie'], NL: ['KNMI', 'https://www.knmi.nl'], BE: ['IRM/KMI', 'https://www.meteo.be'],
+  LU: ['MeteoLux', 'https://www.meteolux.lu'], DE: ['DWD WarnWetter', 'https://www.dwd.de'], AT: ['GeoSphere Austria', 'https://www.geosphere.at'], CH: ['MeteoSwiss', 'https://www.meteoswiss.admin.ch'],
+  LI: ['MeteoSwiss', 'https://www.meteoswiss.admin.ch'], CZ: ['ČHMÚ', 'https://www.chmi.cz'], SK: ['SHMÚ', 'https://www.shmu.sk'], PL: ['IMGW', 'https://meteo.imgw.pl'],
+  HU: ['HungaroMet', 'https://www.met.hu'], TR: ['MGM', 'https://www.mgm.gov.tr'],
+  MA: ['Maroc Météo', 'https://www.marocmeteo.ma'], DZ: ['Météo Algérie', 'https://www.meteo.dz'], TN: ['INM Tunisie', 'https://www.meteo.tn'], EG: ['EMA', 'https://ema.gov.eg'],
+  IL: ['IMS', 'https://ims.gov.il'], JO: ['JMD', 'https://jmd.gov.jo'], SA: ['NCM', 'https://ncm.gov.sa'], AE: ['NCM UAE', 'https://www.ncm.gov.ae'],
+  QA: ['Qatar Weather', 'https://qweather.gov.qa'], BH: ['Bahrain Weather', 'https://www.bahrainweather.gov.bh'], KW: ['Kuwait Met', 'https://www.met.gov.kw'], OM: ['Oman Met', 'https://www.met.gov.om'],
+  IN: ['IMD Mausam', 'https://mausam.imd.gov.in'], NP: ['DHM Nepal', 'https://www.mfd.gov.np'], LK: ['Sri Lanka Met', 'https://www.meteo.gov.lk'], MV: ['Maldives Met', 'https://www.meteorology.gov.mv'],
+  BT: ['NCHM', 'https://www.nchm.gov.bt'], PK: ['PMD', 'https://www.pmd.gov.pk'], CN: ['CMA', 'https://weather.cma.cn'], JP: ['JMA', 'https://www.jma.go.jp'],
+  KR: ['KMA', 'https://www.weather.go.kr'], TW: ['CWA', 'https://www.cwa.gov.tw'], MN: ['NAMEM', 'https://www.weather.gov.mn'], TH: ['TMD', 'https://www.tmd.go.th'],
+  VN: ['NCHMF', 'https://nchmf.gov.vn'], MM: ['DMH Myanmar', 'https://www.moezala.gov.mm'], MY: ['MetMalaysia', 'https://www.met.gov.my'], SG: ['MSS (myENV)', 'https://www.weather.gov.sg'],
+  ID: ['BMKG', 'https://www.bmkg.go.id'], PH: ['PAGASA', 'https://www.pagasa.dost.gov.ph'], BN: ['Brunei Met', 'https://www.met.gov.bn'], KZ: ['Kazhydromet', 'https://www.kazhydromet.kz'],
+  UZ: ['Uzhydromet', 'https://hydromet.uz'],
+  US: ['NWS', 'https://www.weather.gov'], CA: ['WeatherCAN', 'https://weather.gc.ca'], MX: ['SMN', 'https://smn.conagua.gob.mx'], GT: ['INSIVUMEH', 'https://insivumeh.gob.gt'],
+  BZ: ['NMS Belize', 'https://www.nms.gov.bz'], SV: ['MARN', 'https://www.marn.gob.sv'], NI: ['INETER', 'https://www.ineter.gob.ni'], CR: ['IMN', 'https://www.imn.ac.cr'],
+  PA: ['IMHPA', 'https://www.imhpa.gob.pa'], CU: ['INSMET', 'https://www.insmet.cu'], JM: ['Met Service Jamaica', 'https://metservice.gov.jm'], DO: ['INDOMET', 'https://onamet.gob.do'],
+  BS: ['Bahamas Met', 'https://www.bahamasweather.org.bs'], BB: ['Barbados Met', 'https://www.barbadosweather.org'], TT: ['TTMS', 'https://www.metoffice.gov.tt'],
+  AG: ['Antigua Met', 'https://www.antiguamet.com'], KN: ['Antigua Met', 'https://www.antiguamet.com'],
+  CO: ['IDEAM', 'https://www.ideam.gov.co'], EC: ['INAMHI', 'https://www.inamhi.gob.ec'], PE: ['SENAMHI', 'https://www.senamhi.gob.pe'], BO: ['SENAMHI Bolivia', 'https://senamhi.gob.bo'],
+  CL: ['Meteochile', 'https://www.meteochile.gob.cl'], AR: ['SMN Argentina', 'https://www.smn.gob.ar'], UY: ['INUMET', 'https://www.inumet.gub.uy'], PY: ['DMH Paraguay', 'https://www.meteorologia.gov.py'],
+  BR: ['INMET', 'https://portal.inmet.gov.br'], GY: ['Hydromet Guyana', 'https://hydromet.gov.gy'],
+  AU: ['BoM Weather', 'https://www.bom.gov.au'], NZ: ['MetService', 'https://www.metservice.com'], FJ: ['Fiji Met', 'https://www.met.gov.fj'], VU: ['VMGD', 'https://www.vmgd.gov.vu'],
+  PW: ['NWS Guam', 'https://www.weather.gov/gum/'], FM: ['NWS Guam', 'https://www.weather.gov/gum/'], MH: ['NWS Guam', 'https://www.weather.gov/gum/'],
+  ZA: ['SAWS', 'https://www.weathersa.co.za'], KE: ['KMD', 'https://meteo.go.ke'], TZ: ['TMA', 'https://www.meteo.go.tz'], UG: ['UNMA', 'https://www.unma.go.ug'],
+  RW: ['Meteo Rwanda', 'https://www.meteorwanda.gov.rw'], NA: ['Namibia Met', 'https://www.meteona.com'], ZM: ['ZMD', 'https://www.zmd.gov.zm'], ZW: ['MSD Zimbabwe', 'https://www.weatherzw.org.zw'],
+  MZ: ['INAM', 'https://www.inam.gov.mz'], MG: ['Météo Madagascar', 'https://www.meteomadagascar.mg'], MU: ['Mauritius Met', 'https://metservice.intnet.mu'], SC: ['Seychelles Met', 'https://www.meteo.gov.sc'],
+  SN: ['ANACIM', 'https://www.anacim.sn'], GH: ['GMet', 'https://www.meteo.gov.gh'], NG: ['NiMet', 'https://nimet.gov.ng'], CV: ['INMG', 'https://www.inmg.gov.cv']
+};
+function metApp(d) {
+  const m = MET[d.cc], es = S.lang === 'es';
+  if (m) return [m[0] + (es ? ' · tiempo' : ' · weather'), m[1]];
+  return [es ? 'OMM · tiempo oficial' : 'WMO · official weather', 'https://worldweather.wmo.int/' + (es ? 'es' : 'en') + '/home.html'];
+}
 function regionApps(d) {
   const cc = d.cc, ct = d.ct;
   const A = (n, u) => [n, u];
@@ -1118,7 +1167,7 @@ function openDetail(id, keepScroll) {
   const aroundMode = ['walk', 'bus', 'car', 'tour'][d.car];
   const trips = d.nb.map(s => `<li><span class="mode m-tour">${es ? 'Excursión' : 'Day trip'}</span><span>${esc(s)}<span class="tlinks">${tl(es ? 'Cómo llegar' : 'How to get there', 'https://www.rome2rio.com/' + (es ? 'es/' : '') + 'map/' + enc(qName) + '/' + enc(s.replace(/\s*\(.*\)/, '')))}${tl('Maps', mapsQ(s))}</span></span></li>`).join('');
   const companies = [...(OPS[d.cc] || [])];
-  const apps = regionApps(d);
+  const apps = [metApp(d), ...regionApps(d)];
   const roadNotes = [];
   if (rd) {
     const vig = ['CH', 'AT', 'CZ', 'SK', 'SI', 'HU', 'RO', 'BG', 'MD'], tolls = ['FR', 'IT', 'PT', 'HR', 'GR', 'PL', 'RS', 'MK', 'TR', 'IE', 'NO', 'ES', 'ME', 'BA', 'AL'];
@@ -1208,6 +1257,12 @@ function setOrigin(v, msgEl) {
   return false;
 }
 function bind() {
+  const top = $('#toTop');
+  if (top) {
+    const upd = () => { top.classList.toggle('show', scrollY > 700); };
+    addEventListener('scroll', upd, { passive: true }); upd();
+    top.addEventListener('click', () => scrollTo({ top: 0, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }));
+  }
   $('#l-es').addEventListener('click', () => { S.lang = 'es'; save(); applyLang(); });
   $('#l-en').addEventListener('click', () => { S.lang = 'en'; save(); applyLang(); });
   $('#months').addEventListener('click', e => { const b = e.target.closest('[data-m]'); if (!b) return; S.month = +b.dataset.m; save(); renderMonths(); renderList(); });
