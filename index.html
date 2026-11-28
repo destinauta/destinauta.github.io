@@ -532,7 +532,7 @@ const TX = {
     fHaz: 'Riesgos naturales a evitar en ese mes', fDocs: 'Documentos (pasaporte español)', dAny: 'Cualquiera',
     fVac: 'Vacunas y salud', noMand: 'Solo destinos sin vacunas obligatorias', avoidRisk: 'Evitar estos riesgos de salud',
     fSec: 'Seguridad y situación política', secAll: 'Todos', secHide4: 'Ocultar destinos que Exteriores desaconseja', sec1: 'Solo precauciones normales', sec2: 'Hasta "evitar zonas"', sec3: 'Hasta "alta precaución"',
-    fCar: '¿Necesito coche?', fNear: 'Qué hay cerca', fStyle: 'Estilo de viaje', fCont: 'Continente', fBudget: 'Presupuesto diario', bAny: 'Cualquiera', bLow: 'Económico', bMid: 'Medio', bHigh: 'Alto',
+    fCar: '¿Necesito coche?', fNear: 'Qué hay cerca', fStyle: 'Estilo de viaje', fCont: 'Continente', fBudget: 'Presupuesto diario', bAny: 'Cualquiera', bLow: 'Económico', budHint: 'Alojamiento, comida, transporte local y actividades, sin el viaje de ida y vuelta. Se calcula con las opciones que tengas marcadas en «Presupuesto y viaje».', bMid: 'Medio', bHigh: 'Alto',
     fFlight: 'Tiempo de vuelo', flAny: 'Sin límite', fTrip: 'Presupuesto y viaje', getThere: 'Cómo llegar',
     days: 'Días', pax: 'Viajeros', stay: 'Alojamiento', food: 'Comida', local: 'Transporte local', act: 'Actividades', ins: 'Seguro de viaje',
     gEco: 'Vuelo económico', gFlex: 'Vuelo flexible', gGround: 'Tren o autobús', gCar: 'Coche propio',
@@ -574,7 +574,7 @@ const TX = {
     fHaz: 'Natural hazards to avoid that month', fDocs: 'Documents (Spanish passport)', dAny: 'Any',
     fVac: 'Vaccines & health', noMand: 'Only destinations without mandatory vaccines', avoidRisk: 'Avoid these health risks',
     fSec: 'Security & political situation', secAll: 'All', secHide4: 'Hide destinations Spain advises against', sec1: 'Normal precautions only', sec2: 'Up to "avoid some areas"', sec3: 'Up to "high caution"',
-    fCar: 'Do I need a car?', fNear: "What's nearby", fStyle: 'Trip style', fCont: 'Continent', fBudget: 'Daily budget', bAny: 'Any', bLow: 'Low', bMid: 'Medium', bHigh: 'High',
+    fCar: 'Do I need a car?', fNear: "What's nearby", fStyle: 'Trip style', fCont: 'Continent', fBudget: 'Daily budget', bAny: 'Any', bLow: 'Low', budHint: 'Accommodation, food, local transport and activities, without the return journey. Based on the options chosen under “Budget & trip”.', bMid: 'Medium', bHigh: 'High',
     fFlight: 'Flight time', flAny: 'No limit', fTrip: 'Budget & trip', getThere: 'Getting there',
     days: 'Days', pax: 'Travellers', stay: 'Accommodation', food: 'Food', local: 'Local transport', act: 'Activities', ins: 'Travel insurance',
     gEco: 'Economy flight', gFlex: 'Flexible flight', gGround: 'Train or bus', gCar: 'Own car',
@@ -1108,24 +1108,23 @@ function checkGroup(name, opts, arr, noAll) {
   return (noAll ? '' : `<button type="button" class="allbtn" data-all="${name}">${esc(t(allOn ? 'none2' : 'all'))}</button>`) + `<div class="opts">${opts.map(([v, l]) => `<label class="opt"><input type="checkbox" name="${name}" value="${v}"${arr.map(String).includes(String(v)) ? ' checked' : ''}><span>${esc(l)}</span></label>`).join('')}</div>`;
 }
 const selOpts = (opts, val) => opts.map(([v, l]) => `<option value="${v}"${String(val) === String(v) ? ' selected' : ''}>${esc(l)}</option>`).join('');
-/* nightly price shown next to each accommodation type: exact for one destination, typical range (10th–90th percentile) otherwise */
-const STAY_RATE = { hostel: 22, mid: 75, high: 190, flat: 85 };
-let ciRange = null;
-function stayPrice(k, d) {
-  const es = S.lang === 'es', r5 = v => Math.max(5, Math.round(v / 5) * 5), eur = v => es ? `${v} €` : `€${v}`;
-  let txt;
-  if (d) txt = eur(r5(STAY_RATE[k] * d.ci));
-  else {
-    if (!ciRange && DATA.length) { const c = DATA.map(x => x.ci).sort((a, b) => a - b); ciRange = [c[Math.floor(c.length * 0.1)], c[Math.floor(c.length * 0.9)]]; }
-    const [a, b] = ciRange || [0.65, 2.4];
-    txt = es ? `${r5(STAY_RATE[k] * a)}–${r5(STAY_RATE[k] * b)} €` : `€${r5(STAY_RATE[k] * a)}–${r5(STAY_RATE[k] * b)}`;
-  }
-  const unit = { hostel: es ? 'por persona y noche' : 'per person per night', mid: es ? 'por habitación doble y noche' : 'per double room per night', high: es ? 'por habitación doble y noche' : 'per double room per night', flat: es ? 'por noche (hasta 4 personas)' : 'per night (up to 4 people)' }[k];
-  return ` · ${txt} ${unit}`;
+/* daily spend per person (no flights) for a price index, with the trip options currently chosen */
+function dailyPP(ci) {
+  const c = c1(), n = Math.max(1, +c.pax), rooms = Math.ceil(n / 2);
+  const stay = { hostel: 22 * ci * n, mid: 75 * ci * rooms, high: 190 * ci * rooms, flat: 85 * ci * Math.ceil(n / 4) }[c.stay];
+  const food = { street: 15, menu: 24, mid: 40, high: 85 }[c.food] * ci * n;
+  const local = { public: 5 * ci * n, taxi: 22 * ci * Math.ceil(n / 3), rental: 45 * ci * Math.ceil(n / 5) + 10 }[c.local];
+  const act = { low: 8, mid: 22, high: 55 }[c.act] * ci * n;
+  return Math.round((stay + food + local + act) / n / 5) * 5;
+}
+function updBud(P) { const L2 = budLabels(); $$('input[name="bud"]', P).forEach(x => { const l = L2.find(y => y[0] === x.value); if (l) x.nextElementSibling.textContent = l[1]; }); refreshCatVals(); }
+function budLabels() {
+  const es = S.lang === 'es', a = dailyPP(0.7), b = dailyPP(1.3), e = v => es ? `${v} €` : `€${v}`, u = es ? 'al día por persona' : 'a day per person';
+  return [['low', `€ · ${t('bLow')} · ${es ? 'hasta' : 'up to'} ${e(a)} ${u}`], ['mid', `€€ · ${t('bMid')} · ${es ? `${a}–${b} €` : `€${a}–${b}`} ${u}`], ['high', `€€€ · ${t('bHigh')} · ${es ? 'más de' : 'over'} ${e(b)} ${u}`]];
 }
 const OPTS = (d) => ({
   get: [['eco', t('gEco')], ['flex', t('gFlex')], ['ground', t('gGround')], ['car', t('gCar')]],
-  stay: [['hostel', t('aHostel') + stayPrice('hostel', d)], ['mid', t('aMid') + stayPrice('mid', d)], ['high', t('aHigh') + stayPrice('high', d)], ['flat', t('aFlat') + stayPrice('flat', d)]],
+  stay: [['hostel', t('aHostel')], ['mid', t('aMid')], ['high', t('aHigh')], ['flat', t('aFlat')]],
   food: [['street', t('oStreet')], ['menu', t('oMenu')], ['mid', t('oMid')], ['high', t('oHigh')]],
   local: [['public', t('lPublic')], ['taxi', t('lTaxi')], ['rental', t('lRental')]],
   act: [['low', t('xLow')], ['mid', t('xMid')], ['high', t('xHigh')]],
@@ -1162,7 +1161,7 @@ function renderFilters() {
     cat('vac', t('fVac'), `<label class="opt solo"><input type="checkbox" id="noMand"${f.noMand ? ' checked' : ''}><span>${esc(t('noMand'))}</span></label><h3>${esc(t('avoidRisk'))}</h3>` + checkGroup('risks', obj('risk'), f.risks)),
     cat('sty', t('fStyle'), checkGroup('sty', obj('sty'), f.sty)),
     cat('fl', t('fFlight'), checkGroup('fl', [['0', t('fl3')], ['3', '3–6 h'], ['6', '6–10 h'], ['10', '10–14 h'], ['14', t('fl14p')]], f.fl) + `<p class="hint">${esc(t('fFlNote'))}</p>`),
-    cat('bud', t('fBudget'), checkGroup('bud', [['low', '€ · ' + t('bLow')], ['mid', '€€ · ' + t('bMid')], ['high', '€€€ · ' + t('bHigh')]], f.bud)),
+    cat('bud', t('fBudget'), checkGroup('bud', budLabels(), f.bud) + `<p class="hint">${esc(t('budHint'))}</p>`),
     cat('cont', t('fCont'), contGroup(f.cont))
   ].join('') + '</div>';
   syncAll($('#fBody')); refreshCatVals();
@@ -1431,12 +1430,12 @@ function bind() {
   $('#fBody').addEventListener('change', e => {
     const P = $('#fBody');
     if (e.target.classList.contains('par')) $$('.subopts input', P).forEach(x => { x.checked = e.target.checked; });
-    syncAll(P); readFilters(); save(); renderList();
+    syncAll(P); readFilters(); save(); updBud(P); renderList();
   });
   $('#fBody').addEventListener('click', e => {
     const b = e.target.closest('.allbtn'); if (!b) return;
     const P = $('#fBody'), box = $$(`input[name="${b.dataset.all}"]`, P), on = !box.every(x => x.checked);
-    box.forEach(x => { x.checked = on; }); syncAll(P); readFilters(); save(); renderList();
+    box.forEach(x => { x.checked = on; }); syncAll(P); readFilters(); save(); updBud(P); renderList();
   });
   $('#fBody').addEventListener('toggle', e => { const k = e.target.dataset && e.target.dataset.k; if (!k) return; e.target.open ? openSecs.add(k) : openSecs.delete(k); store.set('openCats', [...openSecs]); }, true);
   $('#fClear').addEventListener('click', resetAll); $('#fReset').addEventListener('click', resetAll);
