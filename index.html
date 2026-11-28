@@ -532,7 +532,7 @@ const TX = {
     fHaz: 'Riesgos naturales a evitar en ese mes', fDocs: 'Documentos (pasaporte español)', dAny: 'Cualquiera',
     fVac: 'Vacunas y salud', noMand: 'Solo destinos sin vacunas obligatorias', avoidRisk: 'Evitar estos riesgos de salud',
     fSec: 'Seguridad y situación política', secAll: 'Todos', secHide4: 'Ocultar destinos que Exteriores desaconseja', sec1: 'Solo precauciones normales', sec2: 'Hasta "evitar zonas"', sec3: 'Hasta "alta precaución"',
-    fCar: '¿Necesito coche?', fNear: 'Qué hay cerca', fStyle: 'Estilo de viaje', fCont: 'Continente', fBudget: 'Presupuesto diario', bAny: 'Cualquiera', bLow: 'Económico', budHint: 'Alojamiento, comida, transporte local y actividades, sin el viaje de ida y vuelta. Se calcula con las opciones que tengas marcadas en «Presupuesto y viaje».', bMid: 'Medio', bHigh: 'Alto',
+    fCar: '¿Necesito coche?', fNear: 'Qué hay cerca', fStyle: 'Estilo de viaje', fCont: 'Continente', fBudget: 'Presupuesto total', bAny: 'Cualquiera', bLow: 'Económico', budHint: 'Coste total del viaje para todo el grupo: ida y vuelta, alojamiento, comida, transporte local, actividades, seguro y trámites de entrada. Se calcula con los días, viajeros, mes, origen y opciones que tengas marcados en «Presupuesto y viaje».', bMid: 'Medio', bHigh: 'Alto',
     fFlight: 'Tiempo de vuelo', flAny: 'Sin límite', fTrip: 'Presupuesto y viaje', getThere: 'Cómo llegar',
     days: 'Días', pax: 'Viajeros', stay: 'Alojamiento', food: 'Comida', local: 'Transporte local', act: 'Actividades', ins: 'Seguro de viaje',
     gEco: 'Vuelo económico', gFlex: 'Vuelo flexible', gGround: 'Tren o autobús', gCar: 'Coche propio',
@@ -574,7 +574,7 @@ const TX = {
     fHaz: 'Natural hazards to avoid that month', fDocs: 'Documents (Spanish passport)', dAny: 'Any',
     fVac: 'Vaccines & health', noMand: 'Only destinations without mandatory vaccines', avoidRisk: 'Avoid these health risks',
     fSec: 'Security & political situation', secAll: 'All', secHide4: 'Hide destinations Spain advises against', sec1: 'Normal precautions only', sec2: 'Up to "avoid some areas"', sec3: 'Up to "high caution"',
-    fCar: 'Do I need a car?', fNear: "What's nearby", fStyle: 'Trip style', fCont: 'Continent', fBudget: 'Daily budget', bAny: 'Any', bLow: 'Low', budHint: 'Accommodation, food, local transport and activities, without the return journey. Based on the options chosen under “Budget & trip”.', bMid: 'Medium', bHigh: 'High',
+    fCar: 'Do I need a car?', fNear: "What's nearby", fStyle: 'Trip style', fCont: 'Continent', fBudget: 'Total budget', bAny: 'Any', bLow: 'Low', budHint: 'Total trip cost for the whole group: return journey, accommodation, food, local transport, activities, insurance and entry paperwork. Based on the days, travellers, month, origin and options chosen under “Budget & trip”.', bMid: 'Medium', bHigh: 'High',
     fFlight: 'Flight time', flAny: 'No limit', fTrip: 'Budget & trip', getThere: 'Getting there',
     days: 'Days', pax: 'Travellers', stay: 'Accommodation', food: 'Food', local: 'Local transport', act: 'Activities', ins: 'Travel insurance',
     gEco: 'Economy flight', gFlex: 'Flexible flight', gGround: 'Train or bus', gCar: 'Own car',
@@ -839,7 +839,7 @@ function passes(d) {
   if (f.sty.length && !f.sty.some(x => d.st.includes(x))) return false;
   if (d.ez && !f.cont.includes('ES') && !S.q) return false;
   if (f.cont.length && !f.cont.includes(d.cc === 'ES' ? 'ES' : d.ct === 'EU' ? 'EUR' : d.ct)) return false;
-  if (f.bud.length && !f.bud.includes(d.ci <= 0.7 ? 'low' : d.ci <= 1.3 ? 'mid' : 'high')) return false;
+  if (f.bud.length) { const [a, b] = budCuts(), v = budgetR(d).lo; if (!f.bud.includes(v <= a ? 'low' : v <= b ? 'mid' : 'high')) return false; }
   if (f.fl.length && flying()) { const h = flightH(d); if (!f.fl.includes(h < 3 ? '0' : h < 6 ? '3' : h < 10 ? '6' : h < 14 ? '10' : '14')) return false; }
   if (!reachableBy(d)) return false;
   return true;
@@ -1108,19 +1108,23 @@ function checkGroup(name, opts, arr, noAll) {
   return (noAll ? '' : `<button type="button" class="allbtn" data-all="${name}">${esc(t(allOn ? 'none2' : 'all'))}</button>`) + `<div class="opts">${opts.map(([v, l]) => `<label class="opt"><input type="checkbox" name="${name}" value="${v}"${arr.map(String).includes(String(v)) ? ' checked' : ''}><span>${esc(l)}</span></label>`).join('')}</div>`;
 }
 const selOpts = (opts, val) => opts.map(([v, l]) => `<option value="${v}"${String(val) === String(v) ? ' selected' : ''}>${esc(l)}</option>`).join('');
-/* daily spend per person (no flights) for a price index, with the trip options currently chosen */
-function dailyPP(ci) {
-  const c = c1(), n = Math.max(1, +c.pax), rooms = Math.ceil(n / 2);
-  const stay = { hostel: 22 * ci * n, mid: 75 * ci * rooms, high: 190 * ci * rooms, flat: 85 * ci * Math.ceil(n / 4) }[c.stay];
-  const food = { street: 15, menu: 24, mid: 40, high: 85 }[c.food] * ci * n;
-  const local = { public: 5 * ci * n, taxi: 22 * ci * Math.ceil(n / 3), rental: 45 * ci * Math.ceil(n / 5) + 10 }[c.local];
-  const act = { low: 8, mid: 22, high: 55 }[c.act] * ci * n;
-  return Math.round((stay + food + local + act) / n / 5) * 5;
+/* total-trip budget bands: split the current totals of every destination into thirds, rounded to friendly figures */
+let budCache = { k: '', v: [0, 0] };
+function budCuts() {
+  const key = JSON.stringify([S.c, S.month, S.origin && S.origin.n]);
+  if (budCache.k === key) return budCache.v;
+  const all = DATA.filter(reachableBy).map(d => budgetR(d).lo).sort((a, b) => a - b);
+  const nice = v => { const s = v < 1000 ? 50 : v < 5000 ? 100 : v < 20000 ? 500 : 1000; return Math.max(s, Math.round(v / s) * s); };
+  let a = nice(all[Math.floor(all.length / 3)] || 0), b = nice(all[Math.floor(all.length * 2 / 3)] || 0);
+  if (b <= a) b = a + (a < 1000 ? 50 : 100);
+  budCache = { k: key, v: [a, b] };
+  return budCache.v;
 }
-function updBud(P) { const L2 = budLabels(); $$('input[name="bud"]', P).forEach(x => { const l = L2.find(y => y[0] === x.value); if (l) x.nextElementSibling.textContent = l[1]; }); refreshCatVals(); }
+function updBud(P) { const L2 = budLabels(); $$('input[name="bud"]', P).forEach(x => { const l = L2.find(y => y[0] === x.value); if (l) x.nextElementSibling.textContent = l[1]; }); const h = $('#budFor', P); if (h) h.textContent = budFor(); refreshCatVals(); }
+function budFor() { const c = S.c, es = S.lang === 'es'; return es ? `En total para ${c.pax} viajero${c.pax > 1 ? 's' : ''} y ${c.days} día${c.days > 1 ? 's' : ''}.` : `Total for ${c.pax} traveller${c.pax > 1 ? 's' : ''} and ${c.days} day${c.days > 1 ? 's' : ''}.`; }
 function budLabels() {
-  const es = S.lang === 'es', a = dailyPP(0.7), b = dailyPP(1.3), e = v => es ? `${v} €` : `€${v}`, u = es ? 'al día por persona' : 'a day per person';
-  return [['low', `€ · ${t('bLow')} · ${es ? 'hasta' : 'up to'} ${e(a)} ${u}`], ['mid', `€€ · ${t('bMid')} · ${es ? `${a}–${b} €` : `€${a}–${b}`} ${u}`], ['high', `€€€ · ${t('bHigh')} · ${es ? 'más de' : 'over'} ${e(b)} ${u}`]];
+  const es = S.lang === 'es', [a, b] = budCuts(), m = v => money(v);
+  return [['low', `€ · ${t('bLow')} · ${es ? 'hasta' : 'up to'} ${m(a)}`], ['mid', `€€ · ${t('bMid')} · ${m(a)} – ${m(b)}`], ['high', `€€€ · ${t('bHigh')} · ${es ? 'más de' : 'over'} ${m(b)}`]];
 }
 const OPTS = (d) => ({
   get: [['eco', t('gEco')], ['flex', t('gFlex')], ['ground', t('gGround')], ['car', t('gCar')]],
@@ -1161,7 +1165,7 @@ function renderFilters() {
     cat('vac', t('fVac'), `<label class="opt solo"><input type="checkbox" id="noMand"${f.noMand ? ' checked' : ''}><span>${esc(t('noMand'))}</span></label><h3>${esc(t('avoidRisk'))}</h3>` + checkGroup('risks', obj('risk'), f.risks)),
     cat('sty', t('fStyle'), checkGroup('sty', obj('sty'), f.sty)),
     cat('fl', t('fFlight'), checkGroup('fl', [['0', t('fl3')], ['3', '3–6 h'], ['6', '6–10 h'], ['10', '10–14 h'], ['14', t('fl14p')]], f.fl) + `<p class="hint">${esc(t('fFlNote'))}</p>`),
-    cat('bud', t('fBudget'), checkGroup('bud', budLabels(), f.bud) + `<p class="hint">${esc(t('budHint'))}</p>`),
+    cat('bud', t('fBudget'), `<p class="hint" id="budFor">${esc(budFor())}</p>` + checkGroup('bud', budLabels(), f.bud) + `<p class="hint">${esc(t('budHint'))}</p>`),
     cat('cont', t('fCont'), contGroup(f.cont))
   ].join('') + '</div>';
   syncAll($('#fBody')); refreshCatVals();
