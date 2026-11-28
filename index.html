@@ -771,7 +771,8 @@ const hazAllYear = d => Object.keys(d.hz).filter(k => d.hz[k].length === 12);
 const DOC_TIER = { dni: 0, pas: 1, eta: 2, ev: 3, voa: 3, vis: 4 };
 
 /* ---------- budget ---------- */
-const effC = k => S.c[k].length ? S.c[k] : OPTS()[k].map(x => x[0]);
+const OPTV = { get: ['eco', 'flex', 'ground', 'car'], stay: ['hostel', 'mid', 'high', 'flat'], food: ['street', 'menu', 'mid', 'high'], local: ['public', 'taxi', 'rental'], act: ['low', 'mid', 'high'], ins: ['none', 'basic', 'full'] };
+const effC = k => S.c[k].length ? S.c[k] : OPTV[k];
 const flying = () => effC('get').some(x => x === 'eco' || x === 'flex');
 function c1() { const o = { days: S.c.days, pax: S.c.pax }; CK.forEach(k => { const e = effC(k); o[k] = e.includes(DEF_C[k][0]) ? DEF_C[k][0] : e[0]; }); return o; }
 /* budget range over every selected option (parts are independent, so min/max add up) */
@@ -1107,17 +1108,32 @@ function checkGroup(name, opts, arr, noAll) {
   return (noAll ? '' : `<button type="button" class="allbtn" data-all="${name}">${esc(t(allOn ? 'none2' : 'all'))}</button>`) + `<div class="opts">${opts.map(([v, l]) => `<label class="opt"><input type="checkbox" name="${name}" value="${v}"${arr.map(String).includes(String(v)) ? ' checked' : ''}><span>${esc(l)}</span></label>`).join('')}</div>`;
 }
 const selOpts = (opts, val) => opts.map(([v, l]) => `<option value="${v}"${String(val) === String(v) ? ' selected' : ''}>${esc(l)}</option>`).join('');
-const OPTS = () => ({
+/* nightly price shown next to each accommodation type: exact for one destination, typical range (10th–90th percentile) otherwise */
+const STAY_RATE = { hostel: 22, mid: 75, high: 190, flat: 85 };
+let ciRange = null;
+function stayPrice(k, d) {
+  const es = S.lang === 'es', r5 = v => Math.max(5, Math.round(v / 5) * 5), eur = v => es ? `${v} €` : `€${v}`;
+  let txt;
+  if (d) txt = eur(r5(STAY_RATE[k] * d.ci));
+  else {
+    if (!ciRange && DATA.length) { const c = DATA.map(x => x.ci).sort((a, b) => a - b); ciRange = [c[Math.floor(c.length * 0.1)], c[Math.floor(c.length * 0.9)]]; }
+    const [a, b] = ciRange || [0.65, 2.4];
+    txt = es ? `${r5(STAY_RATE[k] * a)}–${r5(STAY_RATE[k] * b)} €` : `€${r5(STAY_RATE[k] * a)}–${r5(STAY_RATE[k] * b)}`;
+  }
+  const unit = { hostel: es ? 'por persona y noche' : 'per person per night', mid: es ? 'por habitación doble y noche' : 'per double room per night', high: es ? 'por habitación doble y noche' : 'per double room per night', flat: es ? 'por noche (hasta 4 personas)' : 'per night (up to 4 people)' }[k];
+  return ` · ${txt} ${unit}`;
+}
+const OPTS = (d) => ({
   get: [['eco', t('gEco')], ['flex', t('gFlex')], ['ground', t('gGround')], ['car', t('gCar')]],
-  stay: [['hostel', t('aHostel')], ['mid', t('aMid')], ['high', t('aHigh')], ['flat', t('aFlat')]],
+  stay: [['hostel', t('aHostel') + stayPrice('hostel', d)], ['mid', t('aMid') + stayPrice('mid', d)], ['high', t('aHigh') + stayPrice('high', d)], ['flat', t('aFlat') + stayPrice('flat', d)]],
   food: [['street', t('oStreet')], ['menu', t('oMenu')], ['mid', t('oMid')], ['high', t('oHigh')]],
   local: [['public', t('lPublic')], ['taxi', t('lTaxi')], ['rental', t('lRental')]],
   act: [['low', t('xLow')], ['mid', t('xMid')], ['high', t('xHigh')]],
   ins: [['none', t('iNone')], ['basic', t('iBasic')], ['full', t('iFull')]]
 });
 const CALC_LABEL = { get: 'getThere', stay: 'stay', food: 'food', local: 'local', act: 'act', ins: 'ins' };
-function calcControls(prefix) {
-  const c = S.c, O = OPTS();
+function calcControls(prefix, d) {
+  const c = S.c, O = OPTS(d);
   return `<div class="calc">
     <label>${esc(t('days'))}<input id="${prefix}days" type="number" min="1" max="90" value="${c.days}" inputmode="numeric"></label>
     <label>${esc(t('pax'))}<input id="${prefix}pax" type="number" min="1" max="12" value="${c.pax}" inputmode="numeric"></label>
@@ -1323,7 +1339,7 @@ function openDetail(id, keepScroll) {
  <div class="bkgrid">${bk.map(([k, l, n, u]) => `<a class="bkbtn${(k === 'rent' && (d.car === 1 || d.car === 2) && !ownCar()) || (k === 'dircar' && ownCar() && rd) ? ' hl' : ''}" href="${esc(u)}" target="_blank" rel="noopener"><small>${esc(l)} ·</small>${esc(n)} ↗</a>`).join('')}</div>
  <p class="meta">${esc(t('bookNote'))} ${esc(t('dates'))}: ${dt.a} → ${dt.b}${fh ? ` · ✈ ${fmtH(fh)}${distTo(d) > 7500 ? ' (' + t('stopLikely') + ')' : ''}` : ''}</p>
  <p class="gh">${esc(t('official'))}</p><ul class="offl">${off.map(([n, u]) => `<li><a href="${esc(u)}" target="_blank" rel="noopener">${esc(n)} ↗</a></li>`).join('')}</ul></section>
-<section><h3 class="sh">${esc(t('dBudget'))}</h3>${calcControls('d_')}
+<section><h3 class="sh">${esc(t('dBudget'))}</h3>${calcControls('d_', d)}
  <div class="cost"><table class="btable"><tbody>${row('bGet', P.get)}${row('bStay', P.stay)}${row('bFood', P.food)}${row('bLocal', P.local)}${row('bAct', P.act)}${row('bIns', P.ins)}${P.entry[1] ? row('bEntry', P.entry) : ''}</tbody><tfoot><tr><th>${esc(t('total'))}</th><td>${moneyR([b.lo, b.hi])}</td></tr><tr><th>${esc(t('perPerson'))}</th><td>${moneyR(b.pp)}</td></tr></tfoot></table></div>
  ${ownCar() && !rd ? `<p class="note">${esc(t('noDrive'))} ${esc(o.n)}.</p>` : ''}${effC('food').length === 1 && effC('food')[0] === 'menu' ? `<p class="meta">${es ? 'Comida calculada con restaurantes de menú del día (o el equivalente local a mediodía).' : 'Food is based on set-menu (menú del día) restaurants or the local lunchtime equivalent.'}</p>` : ''}<p class="meta">${esc(t('budgetNote'))}</p></section>
 <section><h3 class="sh">${esc(t('dMove'))}</h3>
@@ -1340,10 +1356,14 @@ function openDetail(id, keepScroll) {
   makeCombo('dfrom');
   $('#ov').hidden = false; $('#ov').setAttribute('aria-label', name); document.body.classList.add('lock');
   document.title = `${name} · Destinauta`;
-  if (location.hash !== '#' + id) { try { history.replaceState(null, '', '#' + id); } catch (e) { location.hash = id; } }
+  if (!ovStack.includes('detail')) {
+    if (location.hash === '#' + id) { try { history.replaceState(null, '', location.pathname + location.search); } catch (e) { } }
+    ovPush('detail', '#' + id);
+  } else if (location.hash !== '#' + id) { try { history.replaceState({ dn: 'detail' }, '', '#' + id); } catch (e) { } }
   if (!keepScroll) { sh.scrollTop = 0; $('#closeD').focus(); }
 }
-function closeDetail() {
+function closeDetail() { ovClose('detail', closeDetailNow); }
+function closeDetailNow() {
   currentDetail = null; $('#ov').hidden = true; document.title = 'Destinauta';
   if ($('#fDlg').hidden && $('#sgDlg').hidden) document.body.classList.remove('lock');
   try { history.replaceState(null, '', location.pathname + location.search); } catch (e) { location.hash = ''; }
@@ -1355,6 +1375,7 @@ const box = () => ['destinauta', 'sugerencias'].join('.') + String.fromCharCode(
 function openSuggest() {
   $('#sgAddr').textContent = box();
   $('#sgErr').hidden = true;
+  if ($('#sgDlg').hidden) ovPush('#sgDlg');
   $('#sgDlg').hidden = false; document.body.classList.add('lock'); $('#sgMsg').focus();
 }
 function sendSuggest(e) {
@@ -1374,7 +1395,14 @@ function sendSuggest(e) {
 
 /* ---------- events ---------- */
 const resetAll = () => { S.f = cleanF({}); S.c.get = ['eco']; save(); renderFilters(); renderList(); };
-function closeOv(id) { $(id).hidden = true; if ($('#ov').hidden && $('#fDlg').hidden && $('#sgDlg').hidden && $('#privDlg').hidden) document.body.classList.remove('lock'); }
+/* overlays take a history entry, so the Android back button (and browser back) closes them */
+const ovStack = [];
+function ovPush(kind, url) { try { history.pushState({ dn: kind }, '', url || location.href); ovStack.push(kind); } catch (e) { } }
+function ovClose(kind, now) { if (ovStack.length && ovStack[ovStack.length - 1] === kind) history.back(); else now(); }
+function ovNow(kind) { if (kind === 'detail') closeDetailNow(); else if (kind === '#fDlg') { closeOvNow('#fDlg'); $('#fBtn').focus(); } else closeOvNow(kind); }
+window.addEventListener('popstate', () => { const k = ovStack.pop(); if (k) ovNow(k); });
+function closeOv(id) { ovClose(id, () => closeOvNow(id)); }
+function closeOvNow(id) { $(id).hidden = true; if ($('#ov').hidden && $('#fDlg').hidden && $('#sgDlg').hidden && $('#privDlg').hidden) document.body.classList.remove('lock'); }
 function setOrigin(v, msgEl) {
   const c = findCity(v);
   if (c) { S.origin = c; save(); renderOrigin(); renderList(); if (currentDetail) openDetail(currentDetail, true); return true; }
@@ -1395,8 +1423,8 @@ function bind() {
   $('#sort').addEventListener('change', e => { S.sort = e.target.value; save(); renderList(); });
   const og = $('#origin');
   makeCombo('origin');
-  const openF = () => { renderFilters(); $('#fDlg').hidden = false; document.body.classList.add('lock'); $('#fClose').focus(); };
-  const closeF = () => { closeOv('#fDlg'); $('#fBtn').focus(); };
+  const openF = () => { renderFilters(); if ($('#fDlg').hidden) ovPush('#fDlg'); $('#fDlg').hidden = false; document.body.classList.add('lock'); $('#fClose').focus(); };
+  const closeF = () => ovClose('#fDlg', () => ovNow('#fDlg'));
   $('#fBtn').addEventListener('click', openF);
   $('#fClose').addEventListener('click', closeF); $('#showN').addEventListener('click', closeF);
   $('#fDlg').addEventListener('click', e => { if (e.target.id === 'fDlg') closeF(); });
@@ -1438,10 +1466,10 @@ function bind() {
     const done = () => { $('#sgCopy').textContent = t('sgCopied'); setTimeout(() => { $('#sgCopy').textContent = t('sgCopy'); }, 1800); };
     try { navigator.clipboard.writeText(box()).then(done, () => selectAddr()); } catch (e) { selectAddr(); }
   });
-  $('#privBtn').addEventListener('click', e => { if ($('#privBtn').dataset.inline) { e.preventDefault(); $('#privDlg').hidden = false; document.body.classList.add('lock'); } });
+  $('#privBtn').addEventListener('click', e => { if ($('#privBtn').dataset.inline) { e.preventDefault(); if ($('#privDlg').hidden) ovPush('#privDlg'); $('#privDlg').hidden = false; document.body.classList.add('lock'); } });
   $('#privClose').addEventListener('click', () => closeOv('#privDlg'));
   $('#privDlg').addEventListener('click', e => { if (e.target.id === 'privDlg') closeOv('#privDlg'); });
-  window.addEventListener('hashchange', () => { const h = decodeURIComponent(location.hash.slice(1)); if (h && DATA.some(d => d.id === h)) openDetail(h); else if (!h && currentDetail) closeDetail(); });
+  window.addEventListener('hashchange', () => { const h = decodeURIComponent(location.hash.slice(1)); if (h && DATA.some(d => d.id === h)) openDetail(h); else if (!h && currentDetail && !ovStack.includes('detail')) closeDetailNow(); });
 }
 
 function selectAddr() { const r = document.createRange(); r.selectNodeContents($('#sgAddr')); const s = getSelection(); s.removeAllRanges(); s.addRange(r); }
