@@ -241,6 +241,16 @@ details.cat>.f{padding:0 16px 16px}
 .allbtn:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
 .subopts{margin:6px 0 8px 22px;padding-left:12px;border-left:2px solid var(--line)}
 .cat .f .opts+.opts{margin-top:6px}
+.combo{position:relative;flex:1 1 200px;min-width:0;display:flex}
+.combo input{flex:1;min-width:0;width:100%;min-height:44px;font:16px Nunito,sans-serif;border:1.5px solid var(--line);border-radius:10px;padding:0 44px 0 12px;background:var(--card);color:var(--ink)}
+.combo input:focus{outline:3px solid var(--sun);outline-offset:1px}
+.cbtn{position:absolute;right:2px;top:2px;bottom:2px;width:40px;border:0;background:transparent;color:var(--ink);font-size:18px;cursor:pointer;border-radius:8px}
+.clist{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:70;max-height:min(320px,50vh);overflow:auto;margin:0;padding:4px 0;list-style:none;background:var(--card);border:1.5px solid var(--line);border-radius:12px;box-shadow:0 10px 28px #0003}
+.clist [role=option]{padding:10px 14px;cursor:pointer;font:16px Nunito,sans-serif;color:var(--ink)}
+.clist [role=option] span{color:var(--mute);font-size:13px;margin-left:4px}
+.clist [role=option].act,.clist [role=option]:hover{background:var(--soft)}
+.clist .cg{padding:8px 14px 4px;font:600 12px Fredoka,sans-serif;letter-spacing:.04em;text-transform:uppercase;color:var(--mute)}
+.cgrp{margin-top:12px}.cgrp h4{margin:0 0 6px;font:600 15px Fredoka,sans-serif}
 </style>
 </head>
 <body>
@@ -267,7 +277,7 @@ details.cat>.f{padding:0 16px 16px}
   <button type="button" class="reset" id="fReset" hidden data-t="clear">Borrar filtros</button>
  </div>
  <div class="fromgrid">
-  <div class="fromrow"><label for="origin" data-t="from">Reservar desde</label><select id="origin"></select><span class="code" id="originCode">MAD</span><div class="omsg" id="originMsg" aria-live="polite"></div></div>
+  <div class="fromrow"><label for="origin" data-t="from">Reservar desde</label><div class="combo"><input id="origin" type="text" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="originList" autocomplete="off" spellcheck="false" data-tp="fromHelp"><button type="button" class="cbtn" tabindex="-1" aria-label="Ver lista / Show list">▾</button><ul class="clist" id="originList" role="listbox" hidden></ul></div><span class="code" id="originCode">MAD</span><div class="omsg" id="originMsg" aria-live="polite"></div></div>
   <div class="fromrow"><label for="q" data-t="searchL">Buscar destino</label><input id="q" type="search" autocomplete="off" data-tp="search"></div>
  </div>
 </div></section>
@@ -513,7 +523,7 @@ Addis Abeba|addis ababa|ADD|9.03|38.74|A`.split('\n').map(l => {
 const TX = {
   es: {
     tagline: '¿DÓNDE VIAJAR CADA MES?', suggest: 'Sugerencias', month: 'Mes del viaje', search: 'Buscar destino, país o plato',
-    from: 'Reservar desde', fromHelp: 'Escribe una ciudad (unas 120 reconocidas)', fromOk: 'Aeropuerto', fromBad: 'No la reconozco. Prueba con otra ciudad cercana o su código (MAD, BCN…).',
+    from: 'Reservar desde', fromHelp: 'Escribe una ciudad o elige de la lista', fromList: 'Ver lista de ciudades', fromOk: 'Aeropuerto', fromBad: 'No la encuentro. Prueba con otra ciudad cercana o su código (MAD, BCN…).',
     filters: 'Filtros', sort: 'Ordenar', sBest: 'Mejor tiempo', sCheap: 'Más barato', sNear: 'Vuelo más corto', sAz: 'A–Z',
     results: n => `${n} destino${n === 1 ? '' : 's'}`, none: 'Ningún destino cumple todos los filtros. Quita alguno para ver más.',
     clear: 'Quitar filtros', show: n => `Ver ${n} destinos`, close: 'Cerrar', back: 'Volver',
@@ -555,7 +565,7 @@ const TX = {
   },
   en: {
     tagline: 'WHERE TO TRAVEL EACH MONTH?', suggest: 'Suggestions', month: 'Travel month', search: 'Search destination, country or dish',
-    from: 'Book from', fromHelp: 'Type a city (about 120 recognised)', fromOk: 'Airport', fromBad: "I don't recognise it. Try a nearby city or its code (MAD, BCN…).",
+    from: 'Book from', fromHelp: 'Type a city or pick from the list', fromList: 'Show list of cities', fromOk: 'Airport', fromBad: "Not found. Try a nearby city or its code (MAD, BCN…).",
     filters: 'Filters', sort: 'Sort', sBest: 'Best weather', sCheap: 'Cheapest', sNear: 'Shortest flight', sAz: 'A–Z',
     results: n => `${n} destination${n === 1 ? '' : 's'}`, none: 'No destination matches every filter. Remove one to see more.',
     clear: 'Clear filters', show: n => `Show ${n} destinations`, close: 'Close', back: 'Back',
@@ -701,12 +711,14 @@ const now = new Date();
 const DEF_F = { tmp: [], rn: [], haz: [], docs: [], noMand: false, risks: [], secL: [], car: [], tags: [], sty: [], cont: [], bud: [], fl: [] };
 const ARRF = ['tmp', 'rn', 'haz', 'docs', 'risks', 'secL', 'car', 'tags', 'sty', 'cont', 'bud', 'fl'];
 function cleanF(f) { const o = Object.assign({}, DEF_F); ARRF.forEach(k => { o[k] = Array.isArray(f[k]) ? f[k] : []; }); o.noMand = !!f.noMand; if (o.cont.includes('EU')) o.cont = [...new Set(o.cont.filter(x => x !== 'EU').concat(['ES', 'EUR']))]; return o; }
-const DEF_C = { days: 7, pax: 2, get: 'eco', stay: 'mid', food: 'menu', local: 'public', act: 'mid', ins: 'basic' };
+const DEF_C = { days: 7, pax: 2, get: ['eco'], stay: ['mid'], food: ['menu'], local: ['public'], act: ['mid'], ins: ['basic'] };
+const CK = ['get', 'stay', 'food', 'local', 'act', 'ins'];
+function cleanC(c) { const o = Object.assign({}, DEF_C, c); CK.forEach(k => { o[k] = Array.isArray(o[k]) ? o[k] : (o[k] ? [o[k]] : []); }); return o; }
 const S = {
   lang: store.get('lang', (navigator.language || 'es').slice(0, 2) === 'en' ? 'en' : 'es'),
   month: store.get('month', now.getMonth()), q: '', sort: store.get('sort', 'best'),
   origin: CITIES[store.get('origin', 0)] || CITIES[0],
-  f: cleanF(store.get('f', {})), c: Object.assign({}, DEF_C, store.get('c', {}))
+  f: cleanF(store.get('f', {})), c: cleanC(store.get('c', {}))
 };
 let DATA = [], META = {};
 const t = k => TX[S.lang][k];
@@ -759,7 +771,24 @@ const hazAllYear = d => Object.keys(d.hz).filter(k => d.hz[k].length === 12);
 const DOC_TIER = { dni: 0, pas: 1, eta: 2, ev: 3, voa: 3, vis: 4 };
 
 /* ---------- budget ---------- */
-function budget(d, c = S.c) {
+const effC = k => S.c[k].length ? S.c[k] : OPTS()[k].map(x => x[0]);
+const flying = () => effC('get').some(x => x === 'eco' || x === 'flex');
+function c1() { const o = { days: S.c.days, pax: S.c.pax }; CK.forEach(k => { const e = effC(k); o[k] = e.includes(DEF_C[k][0]) ? DEF_C[k][0] : e[0]; }); return o; }
+/* budget range over every selected option (parts are independent, so min/max add up) */
+function budgetR(d) {
+  const base = c1(), rd = road(d), parts = {};
+  CK.forEach(k => {
+    let opts = effC(k);
+    if (k === 'get') { const ok = opts.filter(v => (v !== 'ground' && v !== 'car') || rd); opts = ok.length ? ok : ['eco']; }
+    const v = opts.map(o => budget(d, Object.assign({}, base, { [k]: o })).parts[k]);
+    parts[k] = [Math.min(...v), Math.max(...v)];
+  });
+  const e = (d.ef || 0) * base.pax; parts.entry = [e, e];
+  const lo = Object.values(parts).reduce((a, b) => a + b[0], 0), hi = Object.values(parts).reduce((a, b) => a + b[1], 0);
+  return { parts, lo, hi, total: lo, pp: [lo / base.pax, hi / base.pax] };
+}
+const moneyR = ([a, b]) => Math.round(b / 5) - Math.round(a / 5) < 2 ? money(a) : `${money(a)} – ${money(b)}`;
+function budget(d, c = c1()) {
   const p = Math.max(1, +c.pax), n = Math.max(1, +c.days), ci = d.ci, rooms = Math.ceil(p / 2);
   const k = distTo(d), rd = road(d);
   let get = 0, getNote = '';
@@ -787,7 +816,7 @@ function budget(d, c = S.c) {
 
 /* ---------- filtering ---------- */
 function reachableBy(d) {
-  if (S.c.get === 'ground' || S.c.get === 'car') return !!road(d);
+  if (!flying()) return !!road(d);
   return true;
 }
 function passes(d) {
@@ -810,7 +839,7 @@ function passes(d) {
   if (d.ez && !f.cont.includes('ES') && !S.q) return false;
   if (f.cont.length && !f.cont.includes(d.cc === 'ES' ? 'ES' : d.ct === 'EU' ? 'EUR' : d.ct)) return false;
   if (f.bud.length && !f.bud.includes(d.ci <= 0.7 ? 'low' : d.ci <= 1.3 ? 'mid' : 'high')) return false;
-  if (f.fl.length && (S.c.get === 'eco' || S.c.get === 'flex')) { const h = flightH(d); if (!f.fl.includes(h < 3 ? '0' : h < 6 ? '3' : h < 10 ? '6' : h < 14 ? '10' : '14')) return false; }
+  if (f.fl.length && flying()) { const h = flightH(d); if (!f.fl.includes(h < 3 ? '0' : h < 6 ? '3' : h < 10 ? '6' : h < 14 ? '10' : '14')) return false; }
   if (!reachableBy(d)) return false;
   return true;
 }
@@ -824,12 +853,12 @@ function weatherScore(d, m) {
 function activeFilterCount() {
   const f = S.f; let n = 0;
   ARRF.forEach(k => { if (f[k].length) n++; }); if (f.noMand) n++;
-  if (S.c.get === 'ground' || S.c.get === 'car') n++;
+  if (!flying()) n++; CK.forEach(k => { if (S.c[k].length !== 1 || S.c[k][0] !== DEF_C[k][0]) n++; });
   return n;
 }
 function results() {
   const m = S.month;
-  const list = DATA.filter(passes).map(d => ({ d, w: weatherScore(d, m), b: budget(d).total, fh: flightH(d) }));
+  const list = DATA.filter(passes).map(d => ({ d, w: weatherScore(d, m), b: budgetR(d).lo, fh: flightH(d) }));
   const cmp = { best: (a, b) => b.w - a.w, cheap: (a, b) => a.b - b.b, near: (a, b) => a.fh - b.fh, az: (a, b) => nm(a.d).localeCompare(nm(b.d), S.lang), warm: (a, b) => b.d.T[S.month] - a.d.T[S.month] }[S.sort] || ((a, b) => b.w - a.w);
   list.sort((a, b) => (a.d.sc === 4) - (b.d.sc === 4) || cmp(a, b));
   return list;
@@ -937,7 +966,7 @@ const HZLEVEL = { hu: 3, ts: 3, vo: 2, fi: 2, fl: 2, he: 2, mo: 2, sa: 2, av: 2,
 const seasonalHaz = d => Object.keys(d.hz).filter(k => d.hz[k].length < 12);
 const isIdeal = (d, m) => d.sc <= 2 && d.T[m] >= 20 && d.T[m] <= 31 && d.R[m] <= 6 && !seasonalHaz(d).some(k => d.hz[k].includes(m + 1) && (d.hv[k] || 2) >= 2);
 const tier = d => d.ci <= 0.7 ? 1 : d.ci <= 1.3 ? 2 : 3;
-const ownCar = () => S.c.get === 'car' || S.c.get === 'ground';
+const ownCar = () => !flying();
 const driveH = rd => Math.max(1, Math.round(rd.km / 80 + Math.floor(rd.km / 400) * 0.25));
 const mapsQ = (q) => 'https://www.google.com/maps/search/?api=1&query=' + enc(q);
 
@@ -967,7 +996,43 @@ function originOptions() {
   return g.map((list, k) => `<optgroup label="${esc(CGRP[S.lang][k])}">${(k ? list.sort((a, b) => coll.compare(a[0].n, b[0].n)) : list).map(([c, i]) => `<option value="${i}"${i === sel ? ' selected' : ''}>${esc(c.n)} (${esc(c.ap)})</option>`).join('')}</optgroup>`).join('');
 }
 function renderOrigin() {
-  $('#origin').innerHTML = originOptions(); $('#originCode').textContent = S.origin.ap;
+  $('#origin').value = S.origin.n; $('#originCode').textContent = S.origin.ap;
+}
+/* origin combobox: type to filter (predictive) or open the full list */
+const comboHTML = id => `<div class="combo"><input id="${id}" type="text" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="${id}List" autocomplete="off" spellcheck="false" value="${esc(S.origin.n)}" placeholder="${esc(t('fromHelp'))}"><button type="button" class="cbtn" tabindex="-1" aria-label="${esc(t('fromList'))}">▾</button><ul class="clist" id="${id}List" role="listbox" hidden></ul></div>`;
+function cityMatches(q) {
+  const n = norm(q), coll = new Intl.Collator(S.lang);
+  const all = CITIES.map((c, i) => [c, i]);
+  if (!n) { const g = [[], [], [], [], []]; all.forEach(x => g[cityGroup(x[0], x[1])].push(x)); return g.map((l, k) => [k, k ? l.sort((a, b) => coll.compare(a[0].n, b[0].n)) : l]); }
+  const sc = c => { const ks = c.keys; if (ks.some(k => k === n)) return 0; if (ks.some(k => k.startsWith(n))) return 1; if (ks.some(k => k.split(/[\s-]+/).some(w => w.startsWith(n)))) return 2; if (ks.some(k => k.includes(n))) return 3; return 9; };
+  const r = all.map(x => [x, sc(x[0])]).filter(x => x[1] < 9).sort((a, b) => a[1] - b[1] || coll.compare(a[0][0].n, b[0][0].n)).slice(0, 40).map(x => x[0]);
+  return [[-1, r]];
+}
+function makeCombo(id) {
+  const inp = document.getElementById(id); if (!inp || inp.dataset.combo) return; inp.dataset.combo = 1;
+  const list = document.getElementById(id + 'List'), btn = inp.parentNode.querySelector('.cbtn');
+  let act = -1, opts = [];
+  const close = () => { list.hidden = true; inp.setAttribute('aria-expanded', 'false'); inp.removeAttribute('aria-activedescendant'); act = -1; };
+  const draw = q => {
+    const groups = cityMatches(q); opts = []; let h = '';
+    groups.forEach(([k, l]) => { if (!l.length) return; if (k >= 0) h += `<li class="cg" role="presentation">${esc(CGRP[S.lang][k])}</li>`; l.forEach(([c, i]) => { h += `<li role="option" id="${id}-o${opts.length}" data-i="${i}" aria-selected="false">${esc(c.n)} <span>${esc(c.ap)}</span></li>`; opts.push(i); }); });
+    list.innerHTML = h || `<li class="cg" role="presentation">${esc(t('fromBad'))}</li>`;
+    list.hidden = false; inp.setAttribute('aria-expanded', 'true'); act = q && opts.length ? 0 : -1; mark();
+  };
+  const mark = () => { $$('[role=option]', list).forEach((li, j) => { li.setAttribute('aria-selected', j === act); li.classList.toggle('act', j === act); }); if (act >= 0) { inp.setAttribute('aria-activedescendant', `${id}-o${act}`); const li = document.getElementById(`${id}-o${act}`); if (li) li.scrollIntoView({ block: 'nearest' }); } else inp.removeAttribute('aria-activedescendant'); };
+  const pick = i => { close(); setOriginIdx(i); const el = document.getElementById(id); if (el) { el.value = S.origin.n; } };
+  inp.addEventListener('focus', () => { inp.select(); draw(''); });
+  inp.addEventListener('input', () => draw(inp.value));
+  inp.addEventListener('click', () => { if (list.hidden) { inp.select(); draw(''); } });
+  inp.addEventListener('keydown', e => {
+    if (e.key === 'ArrowDown') { e.preventDefault(); if (list.hidden) draw(inp.value); act = Math.min(opts.length - 1, act + 1); mark(); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); act = Math.max(0, act - 1); mark(); }
+    else if (e.key === 'Enter') { e.preventDefault(); if (act >= 0) pick(opts[act]); else if (opts.length === 1) pick(opts[0]); }
+    else if (e.key === 'Escape' && !list.hidden) { e.preventDefault(); e.stopPropagation(); close(); inp.value = S.origin.n; }
+  });
+  inp.addEventListener('blur', () => setTimeout(() => { if (document.activeElement !== inp) { close(); inp.value = S.origin.n; } }, 150));
+  list.addEventListener('mousedown', e => { e.preventDefault(); const li = e.target.closest('[role=option]'); if (li) pick(+li.dataset.i); });
+  btn.addEventListener('mousedown', e => { e.preventDefault(); if (list.hidden) { inp.focus(); } else close(); });
 }
 function setOriginIdx(i) { const c = CITIES[+i]; if (!c) return; S.origin = c; save(); renderOrigin(); renderList(); if (currentDetail) openDetail(currentDetail, true); }
 function findCity(v) {
@@ -987,7 +1052,7 @@ function vaxLine(d) {
   return s;
 }
 function card(d, i, full) {
-  const m = S.month, es = S.lang === 'es', b = budget(d), rd = road(d), fh = flightH(d);
+  const m = S.month, es = S.lang === 'es', b = budgetR(d), rd = road(d), fh = flightH(d);
   const seas = seasonalHaz(d).filter(k => d.hz[k].includes(m + 1)), yr = Object.keys(d.hz).filter(k => d.hz[k].length === 12);
   const hzP = [...seas.map(k => `<span class="pill p${(d.hv[k] || 2)}">${esc(lab('haz', k))}</span>`), ...yr.map(k => `<span class="pill p${d.hv[k] || 1}">${esc(lab('haz', k))} · ${esc(t('allYear'))}</span>`)].join('') || `<span class="pill">${esc(t('noHz'))}</span>`;
   const maxT = Math.max(...d.T, 30), minT = Math.min(...d.T, 0), rng = maxT - minT || 1;
@@ -1006,7 +1071,7 @@ function card(d, i, full) {
 ${full ? `<div class="carbox car-${ck}">${CARSVG}<b>${esc(t('car'))} ${esc(lab('car', d.car))}.</b> ${esc(L.carLong[S.lang][d.car])}</div>` : ''}
 <div class="stats"><div><b>${d.T[m]}°</b><span>${esc(t('hi'))}</span></div><div><b>${d.R[m]}</b><span>${esc(t('rd'))}</span></div>${byCar ? `<div><b>${driveH(rd)} h</b><span>${esc(t('drv'))}</span></div>` : `<div><b>${fh ? (Math.round(fh * 2) / 2).toLocaleString(S.lang) + ' h' : '—'}</b><span>${esc(t('fl'))}</span></div>`}<div><b>${'€'.repeat(tier(d))}</b><span>${esc(t('bud'))}</span></div></div>
 <div class="pills">${hzP}</div>
-<div class="cost"><small>${esc(t('costT')(S.c.days, S.c.pax))}</small><b>${money(b.total)}</b><small>≈ ${money(b.pp)} ${esc(t('perP'))}</small></div>
+<div class="cost"><small>${esc(t('costT')(S.c.days, S.c.pax))}</small><b>${moneyR([b.lo, b.hi])}</b><small>≈ ${moneyR(b.pp)} ${esc(t('perP'))}</small></div>
 <div class="sec s${d.sc}"><b>${esc(t('secT'))}: ${esc(lab('sec', d.sc))}</b>${d.ne ? esc(es ? d.ne : d.nn) : esc(es ? 'Precauciones normales, como en cualquier viaje.' : 'Normal precautions, as on any trip.')}</div>
 <div class="doc"><b>${esc(lab('doc', d.dc))}.</b> ${esc(es ? d.dt : d.dn)}</div>
 <div class="doc vx">${vaxLine(d)}</div>
@@ -1015,7 +1080,7 @@ ${full ? `<div class="carbox car-${ck}">${CARSVG}<b>${esc(t('car'))} ${esc(lab('
 <details${full ? ' open' : ''}><summary>${esc(t('more'))}</summary>
 <div class="cal"><span></span>${mrow}<span class="l">${esc(t('tempRow'))}</span>${tempBars}<span class="l">${esc(t('rainRow'))}</span>${rainCells}<span class="l">${esc(t('riskRow'))}</span>${riskCells}</div>
 <div class="pills">${hzAll || `<span class="pill">${esc(t('hazNone'))}</span>`}</div>
-<p class="meta"><b>${esc(t('bGet'))}:</b> ${money(P.get)} · <b>${esc(t('bStay'))}:</b> ${money(P.stay)} · <b>${esc(t('bFood'))}:</b> ${money(P.food)} · <b>${esc(t('bLocal'))}:</b> ${money(P.local)} · <b>${esc(t('bAct'))}:</b> ${money(P.act)} · <b>${esc(t('bIns'))}:</b> ${money(P.ins)}${P.entry ? ` · <b>${esc(t('bEntry'))}:</b> ${money(P.entry)}` : ''}<br>${esc(t('budgetNote'))}</p>
+<p class="meta"><b>${esc(t('bGet'))}:</b> ${moneyR(P.get)} · <b>${esc(t('bStay'))}:</b> ${moneyR(P.stay)} · <b>${esc(t('bFood'))}:</b> ${moneyR(P.food)} · <b>${esc(t('bLocal'))}:</b> ${moneyR(P.local)} · <b>${esc(t('bAct'))}:</b> ${moneyR(P.act)} · <b>${esc(t('bIns'))}:</b> ${moneyR(P.ins)}${P.entry[1] ? ` · <b>${esc(t('bEntry'))}:</b> ${moneyR(P.entry)}` : ''}<br>${esc(t('budgetNote'))}</p>
 <p class="meta"><b>${esc(t('healthT'))}:</b> ${esc(es ? d.h : d.hn)}${d.yc ? ' ' + esc(t('yfc')) : ''} ${esc(t('cvi'))}</p>
 <p class="meta">${esc(es ? d.inf : d.infn).replace(/(^|· )(Idioma|Moneda|Diferencia horaria|Language|Currency|Time difference):/g, '$1<b>$2:</b>')}</p>
 <p class="meta"><b>${esc(t('season'))}:</b> ${esc(season(d, m))} · <b>${esc(t('fromCity'))}:</b> ${esc(S.origin.n)} (${esc(S.origin.ap)})${rd ? ` · ${rd.km.toLocaleString(S.lang)} km ${es ? 'por carretera' : 'by road'}` : ''}</p>
@@ -1056,8 +1121,7 @@ function calcControls(prefix) {
   return `<div class="calc">
     <label>${esc(t('days'))}<input id="${prefix}days" type="number" min="1" max="90" value="${c.days}" inputmode="numeric"></label>
     <label>${esc(t('pax'))}<input id="${prefix}pax" type="number" min="1" max="12" value="${c.pax}" inputmode="numeric"></label>
-    ${Object.keys(O).map(k => `<label>${esc(t(CALC_LABEL[k]))}<select id="${prefix}${k}">${selOpts(O[k], c[k])}</select></label>`).join('')}
-  </div>`;
+  </div>${CK.map(k => `<div class="cgrp"><h4>${esc(t(CALC_LABEL[k]))}</h4>${checkGroup(prefix + k, O[k], c[k])}</div>`).join('')}`;
 }
 const openSecs = new Set(store.get('openCats', []));
 function cat(key, title, body) {
@@ -1070,7 +1134,7 @@ function renderFilters() {
   $('#fBody').innerHTML = `<h3 class="grp">${esc(t('gTrip'))}</h3><div class="cats">` + [
     cat('days', t('days'), `<input id="c_days" type="number" min="1" max="90" value="${c.days}" inputmode="numeric" aria-label="${esc(t('days'))}">`),
     cat('pax', t('pax'), `<input id="c_pax" type="number" min="1" max="12" value="${c.pax}" inputmode="numeric" aria-label="${esc(t('pax'))}">`),
-    ...Object.keys(O).map(k => cat(k, t(CALC_LABEL[k]), `<select id="c_${k}" aria-label="${esc(t(CALC_LABEL[k]))}">${selOpts(O[k], c[k])}</select>` + (k === 'get' ? tripHint : '')))
+    ...CK.map(k => cat(k, t(CALC_LABEL[k]), checkGroup('c_' + k, O[k], c[k]) + (k === 'get' ? tripHint : '')))
   ].join('') + `</div><h3 class="grp">${esc(t('gFilt'))}</h3><div class="cats">` + [
     cat('temp', t('fTemp'), checkGroup('tmp', [['hot', t('tHot')], ['warm', t('tWarm')], ['mild', t('tMild')], ['cool', t('tCool')]], f.tmp)),
     cat('rain', t('fRain'), checkGroup('rn', [['dry', t('rDry')], ['low', t('rLow')], ['wet', t('rWet')]], f.rn)),
@@ -1121,7 +1185,8 @@ function readCalc(prefix) {
   if (!g('days')) return;
   c.days = Math.min(90, Math.max(1, parseInt(g('days').value, 10) || 7));
   c.pax = Math.min(12, Math.max(1, parseInt(g('pax').value, 10) || 1));
-  ['get', 'stay', 'food', 'local', 'act', 'ins'].forEach(k => { if (g(k)) c[k] = g(k).value; });
+  const root = g('days').closest('.ov') || document;
+  CK.forEach(k => { const box = $$(`input[name="${prefix}${k}"]`, root); if (box.length) c[k] = box.filter(x => x.checked).map(x => x.value); });
 }
 
 /* ---------- news ---------- */
@@ -1208,7 +1273,7 @@ const tl = (n, u) => `<a class="tlink" href="${esc(u)}" target="_blank" rel="noo
 function openDetail(id, keepScroll) {
   const d = DATA.find(x => x.id === id); if (!d) return;
   currentDetail = id;
-  const es = S.lang === 'es', m = S.month, o = S.origin, b = budget(d), rd = road(d), dt = tripDates(), name = nm(d);
+  const es = S.lang === 'es', m = S.month, o = S.origin, b = budgetR(d), rd = road(d), dt = tripDates(), name = nm(d);
   const qName = d.en.replace(/\s*\(.*\)/, '').split(' & ')[0];
   const country = countryName(d.cc);
   const cname = `${qName}, ${country}`;
@@ -1251,16 +1316,16 @@ function openDetail(id, keepScroll) {
   const off = [];
   if (PORTALS[d.cc] && ['eta', 'ev', 'voa', 'vis'].includes(d.dc)) off.push([t('portal') + ' (' + lab('doc', d.dc) + ')', PORTALS[d.cc]]);
   off.push([t('maec'), 'https://www.exteriores.gob.es/es/ServiciosAlCiudadano/Paginas/Recomendaciones-de-viaje.aspx'], [t('regViaj'), 'https://registroviajeros.exteriores.gob.es'], [t('sanidad'), 'https://www.sanidad.gob.es/areas/sanidadExterior/laSaludTambienViaja/home.htm']);
-  const P = b.parts, row = (k, v) => `<tr><th>${esc(t(k))}</th><td>${money(v)}</td></tr>`;
+  const P = b.parts, row = (k, v) => `<tr><th>${esc(t(k))}</th><td>${moneyR(v)}</td></tr>`;
   const extra = `
 <section><h3 class="sh">${esc(t('dBook'))}</h3>
- <div class="fromrow" style="background:var(--soft);border:0;margin-bottom:12px"><label for="dfrom">${esc(t('from'))}</label><select id="dfrom">${originOptions()}</select><span class="code">${esc(o.ap)}</span></div>
+ <div class="fromrow" style="background:var(--soft);border:0;margin-bottom:12px"><label for="dfrom">${esc(t('from'))}</label>${comboHTML('dfrom')}<span class="code">${esc(o.ap)}</span></div>
  <div class="bkgrid">${bk.map(([k, l, n, u]) => `<a class="bkbtn${(k === 'rent' && (d.car === 1 || d.car === 2) && !ownCar()) || (k === 'dircar' && ownCar() && rd) ? ' hl' : ''}" href="${esc(u)}" target="_blank" rel="noopener"><small>${esc(l)} ·</small>${esc(n)} ↗</a>`).join('')}</div>
  <p class="meta">${esc(t('bookNote'))} ${esc(t('dates'))}: ${dt.a} → ${dt.b}${fh ? ` · ✈ ${fmtH(fh)}${distTo(d) > 7500 ? ' (' + t('stopLikely') + ')' : ''}` : ''}</p>
  <p class="gh">${esc(t('official'))}</p><ul class="offl">${off.map(([n, u]) => `<li><a href="${esc(u)}" target="_blank" rel="noopener">${esc(n)} ↗</a></li>`).join('')}</ul></section>
 <section><h3 class="sh">${esc(t('dBudget'))}</h3>${calcControls('d_')}
- <div class="cost"><table class="btable"><tbody>${row('bGet', P.get)}${row('bStay', P.stay)}${row('bFood', P.food)}${row('bLocal', P.local)}${row('bAct', P.act)}${row('bIns', P.ins)}${P.entry ? row('bEntry', P.entry) : ''}</tbody><tfoot><tr><th>${esc(t('total'))}</th><td>${money(b.total)}</td></tr><tr><th>${esc(t('perPerson'))}</th><td>${money(b.pp)}</td></tr></tfoot></table></div>
- ${ownCar() && !rd ? `<p class="note">${esc(t('noDrive'))} ${esc(o.n)}.</p>` : ''}${S.c.food === 'menu' ? `<p class="meta">${es ? 'Comida calculada con restaurantes de menú del día (o el equivalente local a mediodía).' : 'Food is based on set-menu (menú del día) restaurants or the local lunchtime equivalent.'}</p>` : ''}<p class="meta">${esc(t('budgetNote'))}</p></section>
+ <div class="cost"><table class="btable"><tbody>${row('bGet', P.get)}${row('bStay', P.stay)}${row('bFood', P.food)}${row('bLocal', P.local)}${row('bAct', P.act)}${row('bIns', P.ins)}${P.entry[1] ? row('bEntry', P.entry) : ''}</tbody><tfoot><tr><th>${esc(t('total'))}</th><td>${moneyR([b.lo, b.hi])}</td></tr><tr><th>${esc(t('perPerson'))}</th><td>${moneyR(b.pp)}</td></tr></tfoot></table></div>
+ ${ownCar() && !rd ? `<p class="note">${esc(t('noDrive'))} ${esc(o.n)}.</p>` : ''}${effC('food').length === 1 && effC('food')[0] === 'menu' ? `<p class="meta">${es ? 'Comida calculada con restaurantes de menú del día (o el equivalente local a mediodía).' : 'Food is based on set-menu (menú del día) restaurants or the local lunchtime equivalent.'}</p>` : ''}<p class="meta">${esc(t('budgetNote'))}</p></section>
 <section><h3 class="sh">${esc(t('dMove'))}</h3>
  <p class="gh">${esc(t('airport'))}</p><ul class="tlist"><li><span class="mode m-${TRMODE[d.tm]}">${esc(lab('tr', d.tm))}</span><span>${esc(trTxt)}</span></li></ul>
  <p class="gh">${esc(t('around'))}</p><ul class="tlist"><li><span class="mode m-${aroundMode}">${esc(lab('car', d.car))}</span><span>${esc(aroundTxt)}</span></li></ul>
@@ -1272,6 +1337,7 @@ function openDetail(id, keepScroll) {
   const html = `<button type="button" class="x" id="closeD" aria-label="${esc(t('close'))}">✕</button>` + card(d, 0, true).replace(/<\/div><\/article>$/, extra + '</div></article>');
   const sh = $('#sheet');
   sh.innerHTML = html;
+  makeCombo('dfrom');
   $('#ov').hidden = false; $('#ov').setAttribute('aria-label', name); document.body.classList.add('lock');
   document.title = `${name} · Destinauta`;
   if (location.hash !== '#' + id) { try { history.replaceState(null, '', '#' + id); } catch (e) { location.hash = id; } }
@@ -1307,7 +1373,7 @@ function sendSuggest(e) {
 }
 
 /* ---------- events ---------- */
-const resetAll = () => { S.f = cleanF({}); S.c.get = 'eco'; save(); renderFilters(); renderList(); };
+const resetAll = () => { S.f = cleanF({}); S.c.get = ['eco']; save(); renderFilters(); renderList(); };
 function closeOv(id) { $(id).hidden = true; if ($('#ov').hidden && $('#fDlg').hidden && $('#sgDlg').hidden && $('#privDlg').hidden) document.body.classList.remove('lock'); }
 function setOrigin(v, msgEl) {
   const c = findCity(v);
@@ -1328,7 +1394,7 @@ function bind() {
   $('#q').addEventListener('input', e => { S.q = e.target.value; renderList(); });
   $('#sort').addEventListener('change', e => { S.sort = e.target.value; save(); renderList(); });
   const og = $('#origin');
-  og.addEventListener('change', () => setOriginIdx(og.value));
+  makeCombo('origin');
   const openF = () => { renderFilters(); $('#fDlg').hidden = false; document.body.classList.add('lock'); $('#fClose').focus(); };
   const closeF = () => { closeOv('#fDlg'); $('#fBtn').focus(); };
   $('#fBtn').addEventListener('click', openF);
@@ -1356,8 +1422,13 @@ function bind() {
     if (!$('#sgDlg').hidden) closeOv('#sgDlg'); else if (!$('#fDlg').hidden) closeF(); else if (!$('#privDlg').hidden) closeOv('#privDlg'); else if (currentDetail) closeDetail();
   });
   $('#sheet').addEventListener('change', e => {
-    if (e.target.id === 'dfrom') { setOriginIdx(e.target.value); return; }
+    if (e.target.id === 'dfrom') return;
     readCalc('d_'); save(); openDetail(currentDetail, true); renderList();
+  });
+  $('#sheet').addEventListener('click', e => {
+    const b = e.target.closest('.allbtn'); if (!b) return;
+    const box = $$(`input[name="${b.dataset.all}"]`, $('#sheet')), on = !box.every(x => x.checked);
+    box.forEach(x => { x.checked = on; }); readCalc('d_'); save(); openDetail(currentDetail, true); renderList();
   });
   $('#sgBtn').addEventListener('click', openSuggest);
   $('#sgClose').addEventListener('click', () => closeOv('#sgDlg'));
