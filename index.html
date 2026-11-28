@@ -88,6 +88,7 @@ h1 small{display:block;font-family:Fredoka,sans-serif;font-weight:600;font-size:
 .fromgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr));gap:12px;margin-top:16px}
 .fromrow{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin:0;background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:10px 12px}
 .fromrow label{font:600 16px Fredoka,sans-serif}
+.fromrow select{flex:1 1 200px;min-height:44px;font:16px Nunito,sans-serif;border:1.5px solid var(--line);border-radius:10px;padding:0 10px;background:var(--card);color:var(--ink);max-width:100%}
 .fromrow input{flex:1 1 200px;min-height:44px;font:16px Nunito,sans-serif;border:1.5px solid var(--line);border-radius:10px;padding:0 12px;background:var(--card);color:var(--ink)}
 .fromrow .code{font:600 15px Fredoka,sans-serif;background:var(--card);border:1.5px dashed #6d1a2a;color:#6d1a2a;border-radius:8px;padding:4px 10px}
 .omsg{flex-basis:100%;font-size:14px;color:var(--mute);min-height:0}
@@ -235,6 +236,11 @@ details.cat>.f{padding:0 16px 16px}
 .totop:focus-visible{outline:3px solid var(--sun);outline-offset:3px}
 .vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 @media (prefers-reduced-motion:reduce){.totop{transition:none}}
+.opt input[type=checkbox]:checked+span::before{content:'✓';margin-right:6px;font-weight:700}
+.allbtn{display:inline-flex;align-items:center;min-height:36px;margin:0 0 8px;padding:0 12px;border-radius:999px;border:1.5px dashed var(--teal);background:transparent;color:var(--teal);font:600 14px Fredoka,sans-serif;cursor:pointer}
+.allbtn:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+.subopts{margin:6px 0 8px 22px;padding-left:12px;border-left:2px solid var(--line)}
+.cat .f .opts+.opts{margin-top:6px}
 </style>
 </head>
 <body>
@@ -261,10 +267,9 @@ details.cat>.f{padding:0 16px 16px}
   <button type="button" class="reset" id="fReset" hidden data-t="clear">Borrar filtros</button>
  </div>
  <div class="fromgrid">
-  <div class="fromrow"><label for="origin" data-t="from">Reservar desde</label><input id="origin" list="cityList" autocomplete="off" maxlength="60" data-tp="fromHelp"><span class="code" id="originCode">MAD</span><div class="omsg" id="originMsg" aria-live="polite"></div></div>
-  <div class="fromrow"><label for="q" data-t="searchL">Buscar</label><input id="q" type="search" autocomplete="off" data-tp="search"></div>
+  <div class="fromrow"><label for="origin" data-t="from">Reservar desde</label><select id="origin"></select><span class="code" id="originCode">MAD</span><div class="omsg" id="originMsg" aria-live="polite"></div></div>
+  <div class="fromrow"><label for="q" data-t="searchL">Buscar destino</label><input id="q" type="search" autocomplete="off" data-tp="search"></div>
  </div>
- <datalist id="cityList"></datalist>
 </div></section>
 
 <main id="main">
@@ -462,7 +467,44 @@ Santiago de Chile|santiago chile|SCL|-33.45|-70.67|S
 Buenos Aires||EZE|-34.60|-58.38|S
 Montevideo||MVD|-34.90|-56.16|S
 São Paulo|sao paulo|GRU|-23.55|-46.63|S
-Río de Janeiro|rio de janeiro,rio|GIG|-22.91|-43.17|S`.split('\n').map(l => {
+Río de Janeiro|rio de janeiro,rio|GIG|-22.91|-43.17|S
+Atlanta||ATL|33.75|-84.39|N
+Dallas||DFW|32.78|-96.80|N
+Denver||DEN|39.74|-104.99|N
+Las Vegas||LAS|36.17|-115.14|N
+Orlando||MCO|28.54|-81.38|N
+Charlotte||CLT|35.23|-80.84|N
+Phoenix||PHX|33.45|-112.07|N
+San Francisco||SFO|37.77|-122.42|N
+Seattle||SEA|47.61|-122.33|N
+Houston||IAH|29.76|-95.37|N
+Boston||BOS|42.36|-71.06|N
+Washington|washington dc|IAD|38.91|-77.04|N
+Vancouver||YVR|49.28|-123.12|N
+Cancún|cancun|CUN|21.16|-86.85|N
+Guadalajara||GDL|20.67|-103.35|N
+Brasilia||BSB|-15.79|-47.88|S
+Cantón|guangzhou,canton|CAN|23.13|113.26|X
+Shenzhen||SZX|22.54|114.06|X
+Chengdu||TFU|30.57|104.07|X
+Kunming||KMG|25.04|102.71|X
+Chongqing||CKG|29.56|106.55|X
+Xi'an|xian|XIY|34.34|108.94|X
+Taipéi|taipei|TPE|25.03|121.57|0
+Osaka||KIX|34.69|135.50|J
+Riad|riyadh,riyad|RUH|24.71|46.68|M
+Yeda|jeddah,jeddah|JED|21.49|39.19|M
+Abu Dabi|abu dhabi|AUH|24.45|54.38|M
+Antalya||AYT|36.90|30.70|E
+Moscú|moscow,moscu|SVO|55.76|37.62|E
+Bangalore|bengaluru|BLR|12.97|77.59|X
+Hyderabad||HYD|17.39|78.49|X
+Ho Chi Minh|saigon|SGN|10.82|106.63|X
+Hanói|hanoi|HAN|21.03|105.85|X
+Bali|denpasar|DPS|-8.65|115.22|0
+Brisbane||BNE|-27.47|153.03|U
+Lagos (Nigeria)|lagos nigeria|LOS|6.52|3.38|A
+Addis Abeba|addis ababa|ADD|9.03|38.74|A`.split('\n').map(l => {
   const [n, al, ap, la, lo, ld] = l.split('|');
   return { n, keys: [n, ...al.split(',').filter(Boolean), ap].map(norm), ap, la: +la, lo: +lo, ld };
 });
@@ -476,12 +518,12 @@ const TX = {
     results: n => `${n} destino${n === 1 ? '' : 's'}`, none: 'Ningún destino cumple todos los filtros. Quita alguno para ver más.',
     clear: 'Quitar filtros', show: n => `Ver ${n} destinos`, close: 'Cerrar', back: 'Volver',
     fClimate: 'Clima', fTemp: 'Temperatura máxima', tAny: 'Cualquiera', tHot: 'Calor (27 °C o más)', tWarm: 'Cálido (22–27 °C)', tMild: 'Templado (15–22 °C)', tCool: 'Fresco (menos de 15 °C)',
-    fRain: 'Lluvia', rAny: 'Me da igual', rLow: 'Poca lluvia (≤ 6 días)', rDry: 'Seco (≤ 2 días)',
+    fRain: 'Lluvia', rAny: 'Me da igual', rLow: 'Poca lluvia (3–6 días)', rDry: 'Seco (0–2 días)', rWet: 'Lluvioso (7 días o más)', all: 'Marcar todas', none2: 'Desmarcar todas', eu: 'Europa', esp: 'España', eur: 'Resto de Europa', fl3: 'Menos de 3 h', fl14p: 'Más de 14 h', fFlNote: 'Solo cuenta si vas en avión.',
     fHaz: 'Riesgos naturales a evitar en ese mes', fDocs: 'Documentos (pasaporte español)', dAny: 'Cualquiera',
     fVac: 'Vacunas y salud', noMand: 'Solo destinos sin vacunas obligatorias', avoidRisk: 'Evitar estos riesgos de salud',
     fSec: 'Seguridad y situación política', secAll: 'Todos', secHide4: 'Ocultar destinos que Exteriores desaconseja', sec1: 'Solo precauciones normales', sec2: 'Hasta "evitar zonas"', sec3: 'Hasta "alta precaución"',
     fCar: '¿Necesito coche?', fNear: 'Qué hay cerca', fStyle: 'Estilo de viaje', fCont: 'Continente', fBudget: 'Presupuesto diario', bAny: 'Cualquiera', bLow: 'Económico', bMid: 'Medio', bHigh: 'Alto',
-    fFlight: 'Tiempo de vuelo máximo', flAny: 'Sin límite', fTrip: 'Presupuesto y viaje', getThere: 'Cómo llegar',
+    fFlight: 'Tiempo de vuelo', flAny: 'Sin límite', fTrip: 'Presupuesto y viaje', getThere: 'Cómo llegar',
     days: 'Días', pax: 'Viajeros', stay: 'Alojamiento', food: 'Comida', local: 'Transporte local', act: 'Actividades', ins: 'Seguro de viaje',
     gEco: 'Vuelo económico', gFlex: 'Vuelo flexible', gGround: 'Tren o autobús', gCar: 'Coche propio',
     aHostel: 'Albergue', aMid: 'Hotel medio', aHigh: 'Hotel alto', aFlat: 'Apartamento turístico',
@@ -518,12 +560,12 @@ const TX = {
     results: n => `${n} destination${n === 1 ? '' : 's'}`, none: 'No destination matches every filter. Remove one to see more.',
     clear: 'Clear filters', show: n => `Show ${n} destinations`, close: 'Close', back: 'Back',
     fClimate: 'Climate', fTemp: 'High temperature', tAny: 'Any', tHot: 'Hot (27 °C or more)', tWarm: 'Warm (22–27 °C)', tMild: 'Mild (15–22 °C)', tCool: 'Cool (below 15 °C)',
-    fRain: 'Rain', rAny: "Don't mind", rLow: 'Little rain (≤ 6 days)', rDry: 'Dry (≤ 2 days)',
+    fRain: 'Rain', rAny: "Don't mind", rLow: 'Little rain (3–6 days)', rDry: 'Dry (0–2 days)', rWet: 'Rainy (7 days or more)', all: 'Select all', none2: 'Clear all', eu: 'Europe', esp: 'Spain', eur: 'Rest of Europe', fl3: 'Under 3 h', fl14p: 'Over 14 h', fFlNote: 'Only applies when flying.',
     fHaz: 'Natural hazards to avoid that month', fDocs: 'Documents (Spanish passport)', dAny: 'Any',
     fVac: 'Vaccines & health', noMand: 'Only destinations without mandatory vaccines', avoidRisk: 'Avoid these health risks',
     fSec: 'Security & political situation', secAll: 'All', secHide4: 'Hide destinations Spain advises against', sec1: 'Normal precautions only', sec2: 'Up to "avoid some areas"', sec3: 'Up to "high caution"',
     fCar: 'Do I need a car?', fNear: "What's nearby", fStyle: 'Trip style', fCont: 'Continent', fBudget: 'Daily budget', bAny: 'Any', bLow: 'Low', bMid: 'Medium', bHigh: 'High',
-    fFlight: 'Maximum flight time', flAny: 'No limit', fTrip: 'Budget & trip', getThere: 'Getting there',
+    fFlight: 'Flight time', flAny: 'No limit', fTrip: 'Budget & trip', getThere: 'Getting there',
     days: 'Days', pax: 'Travellers', stay: 'Accommodation', food: 'Food', local: 'Local transport', act: 'Activities', ins: 'Travel insurance',
     gEco: 'Economy flight', gFlex: 'Flexible flight', gGround: 'Train or bus', gCar: 'Own car',
     aHostel: 'Hostel', aMid: 'Mid-range hotel', aHigh: 'High-end hotel', aFlat: 'Holiday flat',
@@ -656,13 +698,15 @@ function regionApps(d) {
 
 /* ---------- state ---------- */
 const now = new Date();
-const DEF_F = { temp: 'any', rain: 'any', haz: [], docMax: 5, noMand: false, risks: [], sec: 4, hide4: false, car: [], tags: [], sty: [], cont: [], budget: 'any', fmax: 0 };
+const DEF_F = { tmp: [], rn: [], haz: [], docs: [], noMand: false, risks: [], secL: [], car: [], tags: [], sty: [], cont: [], bud: [], fl: [] };
+const ARRF = ['tmp', 'rn', 'haz', 'docs', 'risks', 'secL', 'car', 'tags', 'sty', 'cont', 'bud', 'fl'];
+function cleanF(f) { const o = Object.assign({}, DEF_F); ARRF.forEach(k => { o[k] = Array.isArray(f[k]) ? f[k] : []; }); o.noMand = !!f.noMand; if (o.cont.includes('EU')) o.cont = [...new Set(o.cont.filter(x => x !== 'EU').concat(['ES', 'EUR']))]; return o; }
 const DEF_C = { days: 7, pax: 2, get: 'eco', stay: 'mid', food: 'menu', local: 'public', act: 'mid', ins: 'basic' };
 const S = {
   lang: store.get('lang', (navigator.language || 'es').slice(0, 2) === 'en' ? 'en' : 'es'),
   month: store.get('month', now.getMonth()), q: '', sort: store.get('sort', 'best'),
   origin: CITIES[store.get('origin', 0)] || CITIES[0],
-  f: Object.assign({}, DEF_F, store.get('f', {})), c: Object.assign({}, DEF_C, store.get('c', {}))
+  f: cleanF(store.get('f', {})), c: Object.assign({}, DEF_C, store.get('c', {}))
 };
 let DATA = [], META = {};
 const t = k => TX[S.lang][k];
@@ -753,24 +797,20 @@ function passes(d) {
     const hay = norm([d.es, d.en, countryName(d.cc), d.fd.join(' '), d.si.join(' ')].join(' '));
     if (!hay.includes(q)) return false;
   }
-  if (f.temp === 'hot' && T < 27) return false;
-  if (f.temp === 'warm' && (T < 22 || T > 27)) return false;
-  if (f.temp === 'mild' && (T < 15 || T > 22)) return false;
-  if (f.temp === 'cool' && T >= 15) return false;
-  if (f.rain === 'low' && R > 6) return false;
-  if (f.rain === 'dry' && R > 2) return false;
+  if (f.tmp.length && !f.tmp.includes(T >= 27 ? 'hot' : T >= 22 ? 'warm' : T >= 15 ? 'mild' : 'cool')) return false;
+  if (f.rn.length && !f.rn.includes(R <= 2 ? 'dry' : R <= 6 ? 'low' : 'wet')) return false;
   if (f.haz.length && f.haz.some(h => d.hz[h] && d.hz[h].includes(m + 1))) return false;
-  if (DOC_TIER[d.dc] > f.docMax) return false;
+  if (f.docs.length && !f.docs.includes(d.dc === 'ev' || d.dc === 'voa' ? 'vv' : d.dc)) return false;
   if (f.noMand && d.vm === 1) return false;
   if (f.risks.length && f.risks.some(r => d.rk.includes(r))) return false;
-  if (d.sc > f.sec) return false;
-  if (f.hide4 && d.sc === 4) return false;
+  if (f.secL.length && !f.secL.map(Number).includes(d.sc)) return false;
   if (f.car.length && !f.car.includes(d.car)) return false;
   if (f.tags.length && !f.tags.some(x => d.tg.includes(x))) return false;
   if (f.sty.length && !f.sty.some(x => d.st.includes(x))) return false;
-  if (f.cont.length && !f.cont.includes(d.ct)) return false;
-  if (f.budget !== 'any') { const ci = d.ci; if (f.budget === 'low' && ci > 0.7) return false; if (f.budget === 'mid' && (ci <= 0.7 || ci > 1.3)) return false; if (f.budget === 'high' && ci <= 1.3) return false; }
-  if (f.fmax && (S.c.get === 'eco' || S.c.get === 'flex') && flightH(d) > f.fmax) return false;
+  if (d.ez && !f.cont.includes('ES') && !S.q) return false;
+  if (f.cont.length && !f.cont.includes(d.cc === 'ES' ? 'ES' : d.ct === 'EU' ? 'EUR' : d.ct)) return false;
+  if (f.bud.length && !f.bud.includes(d.ci <= 0.7 ? 'low' : d.ci <= 1.3 ? 'mid' : 'high')) return false;
+  if (f.fl.length && (S.c.get === 'eco' || S.c.get === 'flex')) { const h = flightH(d); if (!f.fl.includes(h < 3 ? '0' : h < 6 ? '3' : h < 10 ? '6' : h < 14 ? '10' : '14')) return false; }
   if (!reachableBy(d)) return false;
   return true;
 }
@@ -783,8 +823,7 @@ function weatherScore(d, m) {
 }
 function activeFilterCount() {
   const f = S.f; let n = 0;
-  if (f.temp !== 'any') n++; if (f.rain !== 'any') n++; n += f.haz.length ? 1 : 0; if (f.docMax < 5) n++; if (f.noMand) n++; n += f.risks.length ? 1 : 0;
-  if (f.sec < 4 || f.hide4) n++; n += f.car.length ? 1 : 0; n += f.tags.length ? 1 : 0; n += f.sty.length ? 1 : 0; n += f.cont.length ? 1 : 0; if (f.budget !== 'any') n++; if (f.fmax) n++;
+  ARRF.forEach(k => { if (f[k].length) n++; }); if (f.noMand) n++;
   if (S.c.get === 'ground' || S.c.get === 'car') n++;
   return n;
 }
@@ -798,7 +837,7 @@ function results() {
 
 /* ---------- extra texts (original look) ---------- */
 Object.assign(TX.es, {
-  tagline: '¿Dónde viajar cada mes?', filters: 'Filtros y opciones', clear: 'Borrar filtros', searchL: 'Buscar', search: 'País, ciudad, plato o lugar…',
+  tagline: '¿Dónde viajar cada mes?', filters: 'Filtros y opciones', clear: 'Borrar filtros', searchL: 'Buscar destino', search: 'País, ciudad, plato o lugar…',
   sub: 'Busca destinos por clima y temporada, riesgos naturales y de seguridad, documentos necesarios con pasaporte español y lo que hay cerca. Los datos se revisan cada estación.',
   footer: 'Datos orientativos para titulares de pasaporte español: clima medio histórico y riesgos recurrentes, no previsiones. Comprueba siempre los requisitos y avisos oficiales antes de reservar.',
   maec: 'Recomendaciones de viaje de Exteriores', edition: (s, r, n) => `Datos: ${s} · revisados el ${r} · próxima actualización: ${n}`,
@@ -818,7 +857,7 @@ Object.assign(TX.es, {
   close: 'Cerrar', news: 'Novedades de esta temporada'
 });
 Object.assign(TX.en, {
-  tagline: 'Where to travel each month?', filters: 'Filters & options', clear: 'Clear filters', searchL: 'Search', search: 'Country, city, dish or place…',
+  tagline: 'Where to travel each month?', filters: 'Filters & options', clear: 'Clear filters', searchL: 'Search destination', search: 'Country, city, dish or place…',
   sub: 'Find destinations by climate and season, natural and security risks, documents needed with a Spanish passport and what is nearby. Data is reviewed every season.',
   footer: 'Guidance for Spanish passport holders: historical average climate and recurring hazards, not forecasts. Always check official requirements and advisories before booking.',
   maec: "Spain's travel advice", edition: (s, r, n) => `Data: ${s} · reviewed ${r} · next update: ${n}`,
@@ -919,10 +958,18 @@ function renderMonths() {
 function renderSort() {
   $('#sort').innerHTML = ['best', 'cheap', 'near', 'warm', 'az'].map(k => `<option value="${k}"${S.sort === k ? ' selected' : ''}>${esc(t('s' + k[0].toUpperCase() + k.slice(1)))}</option>`).join('');
 }
-function renderOrigin() {
-  $('#cityList').innerHTML = CITIES.map(c => `<option value="${esc(c.n)}"></option>`).join('');
-  $('#origin').value = S.origin.n; $('#originCode').textContent = S.origin.ap; $('#originMsg').innerHTML = '';
+const CGRP = { es: ['España', 'Europa', 'África y Oriente Medio', 'Asia y Oceanía', 'América'], en: ['Spain', 'Europe', 'Africa & Middle East', 'Asia & Oceania', 'Americas'] };
+const cityGroup = (c, i) => i <= 38 ? 0 : (c.ld === 'E' || c.ld === 'G') ? 1 : (c.ld === 'A' || c.ld === 'M') ? 2 : (c.lo > 25 ? 3 : 4);
+function originOptions() {
+  const sel = CITIES.indexOf(S.origin), g = [[], [], [], [], []];
+  CITIES.forEach((c, i) => g[cityGroup(c, i)].push([c, i]));
+  const coll = new Intl.Collator(S.lang);
+  return g.map((list, k) => `<optgroup label="${esc(CGRP[S.lang][k])}">${(k ? list.sort((a, b) => coll.compare(a[0].n, b[0].n)) : list).map(([c, i]) => `<option value="${i}"${i === sel ? ' selected' : ''}>${esc(c.n)} (${esc(c.ap)})</option>`).join('')}</optgroup>`).join('');
 }
+function renderOrigin() {
+  $('#origin').innerHTML = originOptions(); $('#originCode').textContent = S.origin.ap;
+}
+function setOriginIdx(i) { const c = CITIES[+i]; if (!c) return; S.origin = c; save(); renderOrigin(); renderList(); if (currentDetail) openDetail(currentDetail, true); }
 function findCity(v) {
   const q = norm(v); if (!q) return null;
   return CITIES.find(c => c.keys.includes(q)) || CITIES.find(c => c.keys.some(k => k.startsWith(q) && q.length >= 3)) || null;
@@ -970,7 +1017,7 @@ ${full ? `<div class="carbox car-${ck}">${CARSVG}<b>${esc(t('car'))} ${esc(lab('
 <div class="pills">${hzAll || `<span class="pill">${esc(t('hazNone'))}</span>`}</div>
 <p class="meta"><b>${esc(t('bGet'))}:</b> ${money(P.get)} · <b>${esc(t('bStay'))}:</b> ${money(P.stay)} · <b>${esc(t('bFood'))}:</b> ${money(P.food)} · <b>${esc(t('bLocal'))}:</b> ${money(P.local)} · <b>${esc(t('bAct'))}:</b> ${money(P.act)} · <b>${esc(t('bIns'))}:</b> ${money(P.ins)}${P.entry ? ` · <b>${esc(t('bEntry'))}:</b> ${money(P.entry)}` : ''}<br>${esc(t('budgetNote'))}</p>
 <p class="meta"><b>${esc(t('healthT'))}:</b> ${esc(es ? d.h : d.hn)}${d.yc ? ' ' + esc(t('yfc')) : ''} ${esc(t('cvi'))}</p>
-<p class="meta">${esc(es ? d.inf : d.infn)}</p>
+<p class="meta">${esc(es ? d.inf : d.infn).replace(/(^|· )(Idioma|Moneda|Diferencia horaria|Language|Currency|Time difference):/g, '$1<b>$2:</b>')}</p>
 <p class="meta"><b>${esc(t('season'))}:</b> ${esc(season(d, m))} · <b>${esc(t('fromCity'))}:</b> ${esc(S.origin.n)} (${esc(S.origin.ap)})${rd ? ` · ${rd.km.toLocaleString(S.lang)} km ${es ? 'por carretera' : 'by road'}` : ''}</p>
 <p class="meta"><a href="https://www.exteriores.gob.es/es/ServiciosAlCiudadano/Paginas/Recomendaciones-de-viaje.aspx" target="_blank" rel="noopener">${esc(t('maec'))}</a></p>
 </details>${full ? '' : `<button type="button" class="open" data-open="${esc(d.id)}">${esc(t('openD'))} →</button>`}</div></article>`;
@@ -990,8 +1037,9 @@ function renderList() {
 function radioGroup(name, opts, val) {
   return `<div class="opts">${opts.map(([v, l]) => `<label class="opt"><input type="radio" name="${name}" value="${v}"${String(val) === String(v) ? ' checked' : ''}><span>${esc(l)}</span></label>`).join('')}</div>`;
 }
-function checkGroup(name, opts, arr) {
-  return `<div class="opts">${opts.map(([v, l]) => `<label class="opt"><input type="checkbox" name="${name}" value="${v}"${arr.map(String).includes(String(v)) ? ' checked' : ''}><span>${esc(l)}</span></label>`).join('')}</div>`;
+function checkGroup(name, opts, arr, noAll) {
+  const allOn = opts.every(([v]) => arr.map(String).includes(String(v)));
+  return (noAll ? '' : `<button type="button" class="allbtn" data-all="${name}">${esc(t(allOn ? 'none2' : 'all'))}</button>`) + `<div class="opts">${opts.map(([v, l]) => `<label class="opt"><input type="checkbox" name="${name}" value="${v}"${arr.map(String).includes(String(v)) ? ' checked' : ''}><span>${esc(l)}</span></label>`).join('')}</div>`;
 }
 const selOpts = (opts, val) => opts.map(([v, l]) => `<option value="${v}"${String(val) === String(v) ? ' selected' : ''}>${esc(l)}</option>`).join('');
 const OPTS = () => ({
@@ -1024,25 +1072,37 @@ function renderFilters() {
     cat('pax', t('pax'), `<input id="c_pax" type="number" min="1" max="12" value="${c.pax}" inputmode="numeric" aria-label="${esc(t('pax'))}">`),
     ...Object.keys(O).map(k => cat(k, t(CALC_LABEL[k]), `<select id="c_${k}" aria-label="${esc(t(CALC_LABEL[k]))}">${selOpts(O[k], c[k])}</select>` + (k === 'get' ? tripHint : '')))
   ].join('') + `</div><h3 class="grp">${esc(t('gFilt'))}</h3><div class="cats">` + [
-    cat('temp', t('fTemp'), radioGroup('temp', [['any', t('tAny')], ['hot', t('tHot')], ['warm', t('tWarm')], ['mild', t('tMild')], ['cool', t('tCool')]], f.temp)),
-    cat('rain', t('fRain'), radioGroup('rain', [['any', t('rAny')], ['low', t('rLow')], ['dry', t('rDry')]], f.rain)),
+    cat('temp', t('fTemp'), checkGroup('tmp', [['hot', t('tHot')], ['warm', t('tWarm')], ['mild', t('tMild')], ['cool', t('tCool')]], f.tmp)),
+    cat('rain', t('fRain'), checkGroup('rn', [['dry', t('rDry')], ['low', t('rLow')], ['wet', t('rWet')]], f.rn)),
     cat('haz', t('fHaz'), checkGroup('haz', obj('haz'), f.haz)),
-    cat('sec', t('fSec'), radioGroup('sec', [[4, t('secAll')], [3, t('sec3')], [2, t('sec2')], [1, t('sec1')]], f.sec) + `<label class="opt solo"><input type="checkbox" id="hide4"${f.hide4 ? ' checked' : ''}><span>${esc(t('secHide4'))}</span></label>`),
+    cat('sec', t('fSec'), checkGroup('secL', [1, 2, 3, 4].map(n => [n, lab('sec', n)]), f.secL)),
     cat('car', t('fCar'), checkGroup('car', L.car[S.lang].map((l, i) => [i, l]), f.car)),
     cat('near', t('fNear'), checkGroup('tags', obj('tags'), f.tags)),
-    cat('docs', t('fDocs'), radioGroup('docMax', [[5, t('dAny')], [0, lab('doc', 'dni')], [1, es ? 'Hasta pasaporte sin visado' : 'Up to passport, no visa'], [2, es ? 'Hasta autorización online' : 'Up to online authorisation'], [3, es ? 'Hasta eVisa o visado a la llegada' : 'Up to eVisa or visa on arrival']], f.docMax)),
+    cat('docs', t('fDocs'), checkGroup('docs', [['dni', lab('doc', 'dni')], ['pas', lab('doc', 'pas')], ['eta', lab('doc', 'eta')], ['vv', es ? 'eVisa o visado a la llegada' : 'eVisa or visa on arrival'], ['vis', lab('doc', 'vis')]], f.docs)),
     cat('vac', t('fVac'), `<label class="opt solo"><input type="checkbox" id="noMand"${f.noMand ? ' checked' : ''}><span>${esc(t('noMand'))}</span></label><h3>${esc(t('avoidRisk'))}</h3>` + checkGroup('risks', obj('risk'), f.risks)),
     cat('sty', t('fStyle'), checkGroup('sty', obj('sty'), f.sty)),
-    cat('fl', t('fFlight'), radioGroup('fmax', [[0, t('flAny')], [3, '3 h'], [6, '6 h'], [10, '10 h'], [14, '14 h']], f.fmax)),
-    cat('bud', t('fBudget'), radioGroup('budget', [['any', t('bAny')], ['low', '€ · ' + t('bLow')], ['mid', '€€ · ' + t('bMid')], ['high', '€€€ · ' + t('bHigh')]], f.budget)),
-    cat('cont', t('fCont'), checkGroup('cont', obj('cont'), f.cont))
+    cat('fl', t('fFlight'), checkGroup('fl', [['0', t('fl3')], ['3', '3–6 h'], ['6', '6–10 h'], ['10', '10–14 h'], ['14', t('fl14p')]], f.fl) + `<p class="hint">${esc(t('fFlNote'))}</p>`),
+    cat('bud', t('fBudget'), checkGroup('bud', [['low', '€ · ' + t('bLow')], ['mid', '€€ · ' + t('bMid')], ['high', '€€€ · ' + t('bHigh')]], f.bud)),
+    cat('cont', t('fCont'), contGroup(f.cont))
   ].join('') + '</div>';
-  refreshCatVals();
+  syncAll($('#fBody')); refreshCatVals();
+}
+function contGroup(arr) {
+  const C = L.cont[S.lang], on = v => arr.includes(v) ? ' checked' : '';
+  const opt = (v, l, cls = '') => `<label class="opt${cls}"><input type="checkbox" name="cont" value="${v}"${on(v)}><span>${esc(l)}</span></label>`;
+  const allOn = ['ES', 'EUR', 'AF', 'AS', 'NA', 'CA', 'SA', 'OC'].every(v => arr.includes(v)), euOn = arr.includes('ES') && arr.includes('EUR');
+  return `<button type="button" class="allbtn" data-all="cont">${esc(t(allOn ? 'none2' : 'all'))}</button><div class="opts"><label class="opt"><input type="checkbox" class="par" data-par="eu"${euOn ? ' checked' : ''}><span>${esc(t('eu'))}</span></label></div>
+<div class="opts subopts">${opt('ES', t('esp'))}${opt('EUR', t('eur'))}</div>
+<div class="opts">${['AF', 'AS', 'NA', 'CA', 'SA', 'OC'].map(k => opt(k, C[k])).join('')}</div>`;
+}
+function syncAll(P) {
+  $$('.allbtn', P).forEach(b => { const box = $$(`input[name="${b.dataset.all}"]`, P); b.textContent = t(box.length && box.every(x => x.checked) ? 'none2' : 'all'); });
+  const par = $('input.par', P); if (par) { const k = $$('.subopts input', P); par.checked = k.every(x => x.checked); par.indeterminate = !par.checked && k.some(x => x.checked); }
 }
 function refreshCatVals() {
   $$('#fBody details.cat').forEach(dt => {
     const f = $('.f', dt), out = [];
-    $$('input:checked', f).forEach(x => { const s = x.nextElementSibling; if (s) out.push(s.textContent); });
+    $$('input:checked:not(.par)', f).forEach(x => { const s = x.nextElementSibling; if (s) out.push(s.textContent); });
     $$('select', f).forEach(x => { const o = x.options[x.selectedIndex]; if (o) out.push(o.textContent); });
     $$('input[type=number]', f).forEach(x => { if (x.value) out.push(x.value); });
     $('.cv', dt).textContent = out.join(' · ');
@@ -1052,9 +1112,8 @@ function readFilters() {
   const P = $('#fBody'), f = S.f;
   const rv = n => { const el = P.querySelector(`input[name="${n}"]:checked`); return el ? el.value : null; };
   const cv = n => $$(`input[name="${n}"]:checked`, P).map(e => e.value);
-  f.temp = rv('temp') || 'any'; f.rain = rv('rain') || 'any'; f.haz = cv('haz'); f.docMax = +(rv('docMax') ?? 5);
-  f.noMand = $('#noMand', P).checked; f.risks = cv('risks'); f.sec = +(rv('sec') ?? 4); f.hide4 = $('#hide4', P).checked;
-  f.car = cv('car').map(Number); f.tags = cv('tags'); f.sty = cv('sty'); f.cont = cv('cont'); f.budget = rv('budget') || 'any'; f.fmax = +(rv('fmax') || 0);
+  f.tmp = cv('tmp'); f.rn = cv('rn'); f.haz = cv('haz'); f.docs = cv('docs'); f.noMand = $('#noMand', P).checked; f.risks = cv('risks');
+  f.secL = cv('secL').map(Number); f.car = cv('car').map(Number); f.tags = cv('tags'); f.sty = cv('sty'); f.cont = cv('cont'); f.bud = cv('bud'); f.fl = cv('fl');
   readCalc('c_');
 }
 function readCalc(prefix) {
@@ -1195,7 +1254,7 @@ function openDetail(id, keepScroll) {
   const P = b.parts, row = (k, v) => `<tr><th>${esc(t(k))}</th><td>${money(v)}</td></tr>`;
   const extra = `
 <section><h3 class="sh">${esc(t('dBook'))}</h3>
- <div class="fromrow" style="background:var(--soft);border:0;margin-bottom:12px"><label for="dfrom">${esc(t('from'))}</label><input id="dfrom" list="cityList" maxlength="60" autocomplete="off" placeholder="${esc(t('fromHelp'))}" value="${esc(o.n)}"><span class="code">${esc(o.ap)}</span><div class="omsg" id="dfromMsg"></div></div>
+ <div class="fromrow" style="background:var(--soft);border:0;margin-bottom:12px"><label for="dfrom">${esc(t('from'))}</label><select id="dfrom">${originOptions()}</select><span class="code">${esc(o.ap)}</span></div>
  <div class="bkgrid">${bk.map(([k, l, n, u]) => `<a class="bkbtn${(k === 'rent' && (d.car === 1 || d.car === 2) && !ownCar()) || (k === 'dircar' && ownCar() && rd) ? ' hl' : ''}" href="${esc(u)}" target="_blank" rel="noopener"><small>${esc(l)} ·</small>${esc(n)} ↗</a>`).join('')}</div>
  <p class="meta">${esc(t('bookNote'))} ${esc(t('dates'))}: ${dt.a} → ${dt.b}${fh ? ` · ✈ ${fmtH(fh)}${distTo(d) > 7500 ? ' (' + t('stopLikely') + ')' : ''}` : ''}</p>
  <p class="gh">${esc(t('official'))}</p><ul class="offl">${off.map(([n, u]) => `<li><a href="${esc(u)}" target="_blank" rel="noopener">${esc(n)} ↗</a></li>`).join('')}</ul></section>
@@ -1248,7 +1307,7 @@ function sendSuggest(e) {
 }
 
 /* ---------- events ---------- */
-const resetAll = () => { S.f = Object.assign({}, DEF_F, { haz: [], risks: [], car: [], tags: [], sty: [], cont: [] }); S.c.get = 'eco'; save(); renderFilters(); renderList(); };
+const resetAll = () => { S.f = cleanF({}); S.c.get = 'eco'; save(); renderFilters(); renderList(); };
 function closeOv(id) { $(id).hidden = true; if ($('#ov').hidden && $('#fDlg').hidden && $('#sgDlg').hidden && $('#privDlg').hidden) document.body.classList.remove('lock'); }
 function setOrigin(v, msgEl) {
   const c = findCity(v);
@@ -1269,15 +1328,22 @@ function bind() {
   $('#q').addEventListener('input', e => { S.q = e.target.value; renderList(); });
   $('#sort').addEventListener('change', e => { S.sort = e.target.value; save(); renderList(); });
   const og = $('#origin');
-  og.addEventListener('change', () => setOrigin(og.value, $('#originMsg')));
-  og.addEventListener('input', () => { if (CITIES.some(c => norm(c.n) === norm(og.value))) setOrigin(og.value, $('#originMsg')); });
-  og.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); setOrigin(og.value, $('#originMsg')); } });
+  og.addEventListener('change', () => setOriginIdx(og.value));
   const openF = () => { renderFilters(); $('#fDlg').hidden = false; document.body.classList.add('lock'); $('#fClose').focus(); };
   const closeF = () => { closeOv('#fDlg'); $('#fBtn').focus(); };
   $('#fBtn').addEventListener('click', openF);
   $('#fClose').addEventListener('click', closeF); $('#showN').addEventListener('click', closeF);
   $('#fDlg').addEventListener('click', e => { if (e.target.id === 'fDlg') closeF(); });
-  $('#fBody').addEventListener('change', () => { readFilters(); save(); renderList(); });
+  $('#fBody').addEventListener('change', e => {
+    const P = $('#fBody');
+    if (e.target.classList.contains('par')) $$('.subopts input', P).forEach(x => { x.checked = e.target.checked; });
+    syncAll(P); readFilters(); save(); renderList();
+  });
+  $('#fBody').addEventListener('click', e => {
+    const b = e.target.closest('.allbtn'); if (!b) return;
+    const P = $('#fBody'), box = $$(`input[name="${b.dataset.all}"]`, P), on = !box.every(x => x.checked);
+    box.forEach(x => { x.checked = on; }); syncAll(P); readFilters(); save(); renderList();
+  });
   $('#fBody').addEventListener('toggle', e => { const k = e.target.dataset && e.target.dataset.k; if (!k) return; e.target.open ? openSecs.add(k) : openSecs.delete(k); store.set('openCats', [...openSecs]); }, true);
   $('#fClear').addEventListener('click', resetAll); $('#fReset').addEventListener('click', resetAll);
   document.addEventListener('click', e => {
@@ -1290,10 +1356,9 @@ function bind() {
     if (!$('#sgDlg').hidden) closeOv('#sgDlg'); else if (!$('#fDlg').hidden) closeF(); else if (!$('#privDlg').hidden) closeOv('#privDlg'); else if (currentDetail) closeDetail();
   });
   $('#sheet').addEventListener('change', e => {
-    if (e.target.id === 'dfrom') { setOrigin(e.target.value, $('#dfromMsg')); return; }
+    if (e.target.id === 'dfrom') { setOriginIdx(e.target.value); return; }
     readCalc('d_'); save(); openDetail(currentDetail, true); renderList();
   });
-  $('#sheet').addEventListener('keydown', e => { if (e.target.id === 'dfrom' && e.key === 'Enter') { e.preventDefault(); setOrigin(e.target.value, $('#dfromMsg')); } });
   $('#sgBtn').addEventListener('click', openSuggest);
   $('#sgClose').addEventListener('click', () => closeOv('#sgDlg'));
   $('#sgDlg').addEventListener('click', e => { if (e.target.id === 'sgDlg') closeOv('#sgDlg'); });
