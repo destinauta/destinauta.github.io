@@ -1,11 +1,16 @@
-[{
-      "relation": ["delegate_permission/common.handle_all_urls"],
-      "target": {
-        "namespace": "android_app",
-        "package_name": "io.github.destinauta.twa",
-        "sha256_cert_fingerprints": [
-          "9F:F8:63:A0:95:DB:DE:1F:D9:83:63:44:DB:18:1A:B2:E5:F3:4B:D9:77:E7:A1:94:1C:9A:9F:CE:57:CA:1A:91",
-          "09:32:31:49:88:CD:16:E4:C4:B9:1F:A3:FC:65:67:98:FC:7A:AF:43:91:D8:D0:43:2C:85:96:77:53:A8:CE:62"
-        ]
-      }
-    }]
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "io.github.destinauta.twa",
+      "sha256_cert_fingerprints": [
+        "2D:5F:A7:D9:60:3B:45:17:3B:86:4D:B0:47:E3:45:C4:22:5A:F1:CE:C9:07:97:2C:AE:23:81:2E:1E:47:17:BD",
+        "9F:F8:63:A0:95:DB:DE:1F:D9:83:63:44:DB:18:1A:B2:E5:F3:4B:D9:77:E7:A1:94:1C:9A:9F:CE:57:CA:1A:91",
+        "09:32:31:49:88:CD:16:E4:C4:B9:1F:A3:FC:65:67:98:FC:7A:AF:43:91:D8:D0:43:2C:85:96:77:53:A8:CE:62"
+      ]
+    }
+  }
+]
